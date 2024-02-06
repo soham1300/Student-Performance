@@ -1,6 +1,6 @@
 import React from "react";
 import Navbar from "../component/Navbar";
-import styled from "@emotion/styled";
+import styled, { keyframes } from "styled-components";
 import aboutImg from "../images/aboutImg.png";
 import CheckIcon from "@mui/icons-material/Check";
 import assignImg from "../images/assign.png";
@@ -13,13 +13,15 @@ function Home() {
   return (
     <HomeDiv>
       <Navbar />
-      <MainText>
-        <MainTextTitle>Student Performance Tracking Tool</MainTextTitle>
-        <MainTextSubTitle>
-          Stay up to date of your student performance with EduSnap performance
-          tracking.
-        </MainTextSubTitle>
-      </MainText>
+      <MainDiv>
+        <MainText>
+          <MainTextTitle>Student Performance Tracking Tool</MainTextTitle>
+          <MainTextSubTitle>
+            Stay up to date of your student performance with EduSnap performance
+            tracking.
+          </MainTextSubTitle>
+        </MainText>
+      </MainDiv>
       <About id="about">
         <AboutTitle>About Student Performance Tracking Tool</AboutTitle>
         <AboutInfo>
@@ -37,7 +39,7 @@ function Home() {
           </AboutText>
         </AboutInfo>
       </About>
-      <Features>
+      <Features id="features">
         <FeaturesTitle>Features</FeaturesTitle>
         {/* Assignment Summary */}
         <FeaturesInfo>
@@ -148,6 +150,7 @@ const MainTextSubTitle = styled.p`
 `;
 
 const About = styled.div`
+  padding-top: 25px;
   width: 75vw;
 `;
 
@@ -172,7 +175,9 @@ const AboutInfo = styled.div`
   margin-left: 20px;
 `;
 
-const Features = styled.div``;
+const Features = styled.div`
+  padding-top: 25px;
+`;
 
 const FeaturesTitle = styled.p`
   font-size: 2.5rem;
@@ -204,4 +209,64 @@ const FeaturesImg = styled.img`
 
 const FeaturesImgDiv = styled.div`
   width: 40vw;
+`;
+
+const MainDiv = styled.div``;
+
+const Area = styled.div`
+  background: #4e54c8;
+  background: -webkit-linear-gradient(to left, #8f94fb, #4e54c8);
+  width: 100%;
+  height: 100vh;
+`;
+
+const Circles = styled.ul`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+`;
+
+const Circle = styled.li`
+  position: absolute;
+  display: block;
+  list-style: none;
+  width: 20px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  animation: animate 25s linear infinite;
+  bottom: -150px;
+
+  &:nth-child(1) {
+    left: 25%;
+    width: 80px;
+    height: 80px;
+    animation-delay: 0s;
+  }
+
+  &:nth-child(2) {
+    left: 10%;
+    width: 20px;
+    height: 20px;
+    animation-delay: 2s;
+    animation-duration: 12s;
+  }
+
+  /* ... styles for other circles ... */
+`;
+
+const animate = keyframes`
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+    border-radius: 0;
+  }
+
+  100% {
+    transform: translateY(-1000px) rotate(720deg);
+    opacity: 0;
+    border-radius: 50%;
+  }
 `;

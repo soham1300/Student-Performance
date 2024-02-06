@@ -135,7 +135,6 @@ function Register({ toast }) {
       <RegisterTitle>
         Join EduSnap: Empowering Schools for Excellence
       </RegisterTitle>
-      <hr />
       <RegisterText>Registration Form</RegisterText>
       <RegisterForm>
         <SchoolInfoText>School Info</SchoolInfoText>
@@ -283,13 +282,17 @@ export default Register;
 
 const RegisterDiv = styled.div`
   height: 100vh;
+  width: 100%;
 `;
 
-const RegisterTitle = styled.p`
+const RegisterTitle = styled.div`
   font-size: 2.5rem;
   font-weight: bold;
   text-align: center;
-  /* background-color: #2e3b55; */
+  justify-content: center;
+  background-color: #2e3b55;
+  padding: 20px 0;
+  color: white;
 `;
 
 const RegisterForm = styled.form`

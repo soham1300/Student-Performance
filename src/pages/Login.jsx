@@ -19,8 +19,13 @@ function Login({ toast }) {
       .then((userCredential) => {
         // Signed in
         // const user = userCredential.user;
-        navigate("/user/home");
+        navigate("/");
         // ...
+        if (isParantLogin) {
+          navigate("/");
+        } else {
+          navigate("/admin/classes");
+        }
       })
       .catch((error) => {
         toast.error(error.code);
@@ -213,7 +218,8 @@ const ParentLoginDivOverlay = styled.div`
   height: 100%;
   width: 50%;
   border-radius: 25px 0 0 25px;
-  background-color: orange;
+  color: white;
+  background-color: #2e3b55;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -227,7 +233,8 @@ const TeacherLoginDivOverlay = styled.div`
   height: 100%;
   width: 50%;
   border-radius: 0 25px 25px 0;
-  background-color: orange;
+  color: white;
+  background-color: #2e3b55;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -238,11 +245,11 @@ const TeacherLoginDivOverlay = styled.div`
 
 const OverlayTitle = styled.p`
   font-size: 2rem;
-  margin-bottom: 10px;
+  margin: 10px;
 `;
 
 const OverlayDescription = styled.p`
   font-size: 1rem;
   text-align: center;
-  margin-bottom: 20px;
+  margin: 20px;
 `;

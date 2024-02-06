@@ -31,6 +31,14 @@ function Navbar() {
     setAnchorElNav(null);
   };
 
+  const scrollToSection = (sectionId) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth" });
+    }
+    handleCloseNavMenu(); // Close the mobile menu after clicking a link
+  };
+
   return (
     <AppBar position="fixed" style={{ background: "#2E3B55" }}>
       <Container maxWidth="xl">
@@ -84,37 +92,24 @@ function Navbar() {
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} href={`#${page.toLowerCase()}`}>
+                <MenuItem
+                  key={page}
+                  onClick={() => scrollToSection(page.toLowerCase())}
+                  href={`#${page.toLowerCase()}`}
+                >
                   <Typography textAlign="center">{page}</Typography>
                 </MenuItem>
               ))}
             </Menu>
           </Box>
           <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href="#app-bar-with-responsive-menu"
-            sx={{
-              mr: 2,
-              display: { xs: "flex", md: "none" },
-              flexGrow: 1,
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              color: "inherit",
-              textDecoration: "none",
-            }}
-          >
-            LOGO
-          </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map((page) => (
               <Button
                 key={page}
                 onClick={handleCloseNavMenu}
                 sx={{ my: 2, color: "white", display: "block" }}
+                href={`#${page.toLowerCase()}`}
               >
                 {page}
               </Button>
