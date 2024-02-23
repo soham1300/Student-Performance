@@ -3,33 +3,162 @@ import React, { useState } from "react";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../DB/FirebaseConfig";
+import { auth, db } from "../DB/FirebaseConfig";
+import {
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 function Login({ toast }) {
   const [isParantLogin, setIsParentLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
   const navigate = useNavigate();
+  const [parentRegister, setParentRegister] = useState(false);
   const switchLoginText = isParantLogin
     ? "Login as a School Administrator"
     : "Login as a Parent or Teacher";
 
   const Login = async () => {
     await signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
+      .then(async (userCredential) => {
         // Signed in
-        // const user = userCredential.user;
-        navigate("/");
+        const user = userCredential.user;
         // ...
         if (isParantLogin) {
-          navigate("/");
+          const q = query(
+            collection(db, "users"),
+            where("uid", "==", user.uid)
+          );
+
+          const querySnapshot = await getDocs(q);
+
+          querySnapshot.forEach(async (doc) => {
+            if (isParantLogin) {
+              if (doc.data().type === "teacher") {
+                navigate("/teacher");
+              } else {
+                navigate("/student");
+              }
+            } else {
+              navigate("/admin/classes");
+            }
+          });
         } else {
           navigate("/admin/classes");
         }
       })
-      .catch((error) => {
-        toast.error(error.code);
+      .catch(async (error) => {
+        // if (error.code === "auth/invalid-credential") {
+        //   const emailAvailable = await checkEmail();
+        //   if (emailAvailable) {
+        //     setParentRegister(true);
+        //     if (password === passwordConfirm) {
+        //       createUserWithEmailAndPassword(auth, email, password)
+        //         .then(async (userCredential) => {
+        //           const user = userCredential.user;
+        //           await updateDoc(
+        //             await query(
+        //               collection(db, "users"),
+        //               where("loginEmail", "==", email)
+        //             ),
+        //             {
+        //               uid: user.uid,
+        //             }
+        //           );
+        //           if (isParantLogin) {
+        //             // const docSnap = await getDoc(
+        //             //   await query(
+        //             //     collection(db, "users"),
+        //             //     where("loginEmail", "==", email)
+        //             //   )
+        //             // );
+        //             const q = query(
+        //               collection(db, "users"),
+        //               where("loginEmail", "==", email)
+        //             );
+        //             const querySnapshot = await getDocs(q);
+        //             querySnapshot.forEach((doc) => {
+        //               // doc.data() is never undefined for query doc snapshots
+        //               console.log(doc.id, " => ", doc.data());
+
+        //               if (doc.data().type === "teacher") {
+        //                 navigate("/teacher");
+        //               } else {
+        //                 navigate("/student");
+        //               }
+        //             });
+        //           } else {
+        //             navigate("/admin/classes");
+        //           }
+        //         })
+        //         .catch((error) => {
+        //           const errorMessage = error.message;
+        //           console.log(errorMessage);
+        //           // ..
+        //         });
+        //     } else {
+        //       toast.error("Password doesn't match");
+        //     }
+        //   }
+        // } else {
+        //   toast.error(error.code);
+        // }
+
+        if (error.code === "auth/invalid-credential") {
+          const emailAvailable = await checkEmail();
+          if (emailAvailable) {
+            setParentRegister(true);
+            if (password === passwordConfirm) {
+              createUserWithEmailAndPassword(auth, email, password)
+                .then(async (userCredential) => {
+                  const user = userCredential.user;
+                  const q = query(
+                    collection(db, "users"),
+                    where("loginEmail", "==", email)
+                  );
+                  const querySnapshot = await getDocs(q);
+                  querySnapshot.forEach(async (doc) => {
+                    await updateDoc(doc.ref, {
+                      uid: user.uid,
+                    });
+                    if (isParantLogin) {
+                      if (doc.data().type === "teacher") {
+                        navigate("/teacher");
+                      } else {
+                        navigate("/student");
+                      }
+                    } else {
+                      navigate("/admin/classes");
+                    }
+                  });
+                })
+                .catch((error) => {
+                  const errorMessage = error.message;
+                  console.log(errorMessage);
+                });
+            } else {
+              toast.error("Password doesn't match");
+            }
+          }
+        } else {
+          toast.error(error.code);
+        }
       });
+  };
+
+  const checkEmail = async () => {
+    const usersRef = collection(db, "users");
+    const q = await query(usersRef, where("loginEmail", "==", email));
+    const querySnapshot = await getDocs(q);
+    return !querySnapshot.empty;
   };
 
   return (
@@ -37,7 +166,9 @@ function Login({ toast }) {
       <LoginDiv>
         <ParentLoginDiv isParantLogin={isParantLogin}>
           <LoginForm>
-            <Title>Parent / Teacher Login</Title>
+            <Title>
+              Parent / Teacher {parentRegister ? "Register" : "Login"}
+            </Title>
             <Emailinput
               onChange={(e) => {
                 setEmail(e.target.value);
@@ -50,6 +181,14 @@ function Login({ toast }) {
               }}
               required
             />
+            {parentRegister && (
+              <Passwordinput
+                onChange={(e) => {
+                  setPasswordConfirm(e.target.value);
+                }}
+                required
+              />
+            )}
             <Button
               variant="contained"
               color="success"

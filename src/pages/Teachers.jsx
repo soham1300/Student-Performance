@@ -10,6 +10,8 @@ import {
   getDoc,
   serverTimestamp,
   arrayUnion,
+  collection,
+  addDoc,
 } from "firebase/firestore";
 import { UserContext } from "../context/UserContex";
 import { db, auth } from "../DB/FirebaseConfig";
@@ -49,33 +51,53 @@ function Teachers({ toast }) {
     }
   };
 
-  const Register = (clsId, className) => {
-    createUserWithEmailAndPassword(
-      auth,
-      teacherLoginEmail,
-      teacherLoginPassword
-    )
-      .then(async (userCredential) => {
-        const user = userCredential.user;
-        await setDoc(doc(db, "users", user.uid), {
-          uid: user.uid,
-          displayName: teacherName,
-          classId: clsId,
-          class: className,
-          loginEmail: teacherLoginEmail,
-          timestamp: serverTimestamp(),
-          type: "teacher",
-        });
-        await updateDoc(doc(db, "school", currentUser.uid), {
-          teachers: arrayUnion({ name: teacherName, uid: user.uid }),
-        });
-        navigate("/teacher");
-      })
-      .catch((error) => {
-        const errorMessage = error.message;
-        console.log(errorMessage);
-        // ..
+  // const Register = (clsId, className) => {
+  //   createUserWithEmailAndPassword(
+  //     auth,
+  //     teacherLoginEmail,
+  //     teacherLoginPassword
+  //   )
+  //     .then(async (userCredential) => {
+  //       const user = userCredential.user;
+  //       await setDoc(doc(db, "users", user.uid), {
+  //         uid: user.uid,
+  //         displayName: teacherName,
+  //         classId: clsId,
+  //         class: className,
+  //         loginEmail: teacherLoginEmail,
+  //         timestamp: serverTimestamp(),
+  //         type: "teacher",
+  //       });
+  //       await updateDoc(doc(db, "school", currentUser.uid), {
+  //         teachers: arrayUnion({ name: teacherName, uid: user.uid }),
+  //       });
+  //       // navigate("/teacher");
+  //       await auth.signOut();
+  //     })
+  //     .catch((error) => {
+  //       const errorMessage = error.message;
+  //       console.log(errorMessage);
+  //       // ..
+  //     });
+  // };
+
+  const Register = async (clsId, className) => {
+    try {
+      const docRef = await addDoc(collection(db, "users"), {
+        displayName: teacherName,
+        classId: clsId,
+        class: className,
+        loginEmail: teacherLoginEmail,
+        timestamp: serverTimestamp(),
+        type: "teacher",
       });
+      await updateDoc(doc(db, "school", currentUser.uid), {
+        teachers: arrayUnion({ name: teacherName, uid: docRef.uid }),
+      });
+    } catch (error) {
+      const errorMessage = error.message;
+      console.log(errorMessage);
+    }
   };
 
   // useEffect(() => {
@@ -149,12 +171,12 @@ function Teachers({ toast }) {
               variant="outlined"
               onChange={(e) => setTeacherLoginEmail(e.target.value)}
             />
-            <TextField
+            {/* <TextField
               id="outlined-basic"
               label="Teacher Login Password"
               variant="outlined"
               onChange={(e) => setTeacherLoginPassword(e.target.value)}
-            />
+            /> */}
           </InputDiv>
           <ButtonDiv>
             <Button variant="contained" color="success" onClick={handleClick}>

@@ -7,13 +7,7 @@ import { GiTeacher } from "react-icons/gi";
 import { PiStudent } from "react-icons/pi";
 import { PiChartScatter } from "react-icons/pi";
 import { MdOutlineAssignment } from "react-icons/md";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
+
 import { DataGrid } from "@mui/x-data-grid";
 
 function Class() {
@@ -670,7 +664,12 @@ function Class() {
 
   const DataTable = () => {
     return (
-      <div style={{ width: "86vw" }}>
+      <div
+        style={{
+          width: "86vw",
+          height: "80vh",
+        }}
+      >
         <DataGrid rows={rows} columns={columns} />
       </div>
     );
@@ -721,56 +720,6 @@ function Class() {
     </ClassDiv>
   );
 }
-
-// const AttendanceTable = ({ data }) => {
-//   // Combine attendance information for each unique student ID
-//   const aggregatedData = data.reduce((acc, row) => {
-//     if (!acc[row.id]) {
-//       acc[row.id] = {
-//         id: row.id,
-//         studentName: row.studentName,
-//         attendanceByDate: {},
-//       };
-//     }
-//     acc[row.id].attendanceByDate[row.date] = row.attendance;
-//     return acc;
-//   }, {});
-
-//   // Extract unique dates from the data
-//   const uniqueDates = [...new Set(data.map((row) => row.date))];
-
-//   return (
-//     <TableContainer
-//       component={Paper}
-//       style={{ maxHeight: "500px", width: "87%", overflowY: "auto" }}
-//     >
-//       <Table>
-//         <TableHead>
-//           <TableRow>
-//             <TableCell>Student Name</TableCell>
-//             {uniqueDates.map((date) => (
-//               <TableCell key={date} align="center">
-//                 {date}
-//               </TableCell>
-//             ))}
-//           </TableRow>
-//         </TableHead>
-//         <TableBody>
-//           {Object.values(aggregatedData).map((student) => (
-//             <TableRow key={student.id}>
-//               <TableCell>{student.studentName}</TableCell>
-//               {uniqueDates.map((date) => (
-//                 <TableCell key={date} align="center">
-//                   {student.attendanceByDate[date] || "-"}
-//                 </TableCell>
-//               ))}
-//             </TableRow>
-//           ))}
-//         </TableBody>
-//       </Table>
-//     </TableContainer>
-//   );
-// };
 
 export default Class;
 
