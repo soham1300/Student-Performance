@@ -15,10 +15,14 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { AuthContext } from "../context/AuthContext";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import { useNavigate } from "react-router-dom";
+import { Line } from "react-chartjs-2";
 
 function TeacherDashboard() {
-  const [classData, setClassData] = useState();
+  const [classData, setClassData] = useState(null);
   const { currentUser } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,42 +46,52 @@ function TeacherDashboard() {
     };
     fetchData();
   }, [currentUser.uid]);
-  if (!classData) {
-    return <div>Loading...</div>;
-  }
+
   return (
     <TeacherDashboardDiv>
-      <Title>Teacher Dashboard</Title> <hr />
-      <ClassDataBoxDiv>
-        <ClassDataBox>
-          <GiTeacher size={42} />
-          Class
-          <ClassDataBoxData>
-            {classData.className ? classData.className : "-"}
-          </ClassDataBoxData>
-        </ClassDataBox>
-        <ClassDataBox>
-          <PiStudent size={42} />
-          Total Students
-          <ClassDataBoxData>
-            {classData.students ? classData.students.length() : "-"}
-          </ClassDataBoxData>
-        </ClassDataBox>
-        <ClassDataBox>
-          <PiChartScatter size={42} />
-          Avg. Attendance
-          <ClassDataBoxData>
-            {classData.Attendance ? classData.Attendance : "-"}
-          </ClassDataBoxData>
-        </ClassDataBox>
-        <ClassDataBox>
-          <MdOutlineAssignment size={42} />
-          Assignments
-          <ClassDataBoxData>
-            {classData.assignments ? classData.assignments : "-"}
-          </ClassDataBoxData>
-        </ClassDataBox>
-      </ClassDataBoxDiv>
+      {classData && (
+        <>
+          <Title>Teacher Dashboard</Title> <hr />
+          <ClassDataBoxDiv>
+            <ClassDataBox>
+              <GiTeacher size={42} />
+              Class
+              <ClassDataBoxData>
+                {classData.className ? classData.className : "-"}
+              </ClassDataBoxData>
+            </ClassDataBox>
+            <ClassDataBox>
+              <PiStudent size={42} />
+              Total Students
+              <ClassDataBoxData>
+                {classData.students ? classData.students.length : "-"}
+              </ClassDataBoxData>
+            </ClassDataBox>
+            <ClassDataBox>
+              <PiChartScatter size={42} />
+              Avg. Attendance
+              <ClassDataBoxData>
+                {classData.attendance ? classData.attendance.length : "-"}
+              </ClassDataBoxData>
+            </ClassDataBox>
+            <ClassDataBox>
+              <MdOutlineAssignment size={42} />
+              Assignments
+              <ClassDataBoxData>
+                {classData.assignments ? classData.assignments : "-"}
+              </ClassDataBoxData>
+            </ClassDataBox>
+          </ClassDataBoxDiv>
+          <AttendanceDiv>
+            <AttendanceTop>
+              <Title>Attendance</Title>
+              <TakeAtt onClick={() => navigate("/attendance")}>
+                Take Attendance <KeyboardArrowRightIcon fontSize="large" />
+              </TakeAtt>
+            </AttendanceTop>
+          </AttendanceDiv>
+        </>
+      )}
     </TeacherDashboardDiv>
   );
 }
@@ -116,4 +130,28 @@ const ClassDataBoxData = styled.p`
   margin: 0;
   font-size: 1.5rem;
   font-weight: bold;
+`;
+
+const AttendanceDiv = styled.div``;
+
+const AttendanceTop = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+`;
+
+const TakeAtt = styled.p`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  margin-right: 12px;
+  padding: 0px 12px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
 `;

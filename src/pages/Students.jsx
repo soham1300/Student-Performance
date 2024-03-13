@@ -10,6 +10,9 @@ import {
   getDoc,
   serverTimestamp,
   arrayUnion,
+  collection,
+  addDoc,
+  onSnapshot,
 } from "firebase/firestore";
 import { UserContext } from "../context/UserContex";
 import { db, auth } from "../DB/FirebaseConfig";
@@ -27,6 +30,22 @@ function Students({ toast }) {
   const [studentLoginPassword, setStudentLoginPassword] = useState();
   const [student, setStudent] = useState([]);
 
+  // const handleClick = async () => {
+  //   const classPresent = userData.classes.some(
+  //     (cls) => cls.className === studentClass
+  //   );
+  //   console.log(classPresent);
+  //   if (classPresent) {
+  //     userData.classes.map(async (cls) => {
+  //       if (cls.className === studentClass) {
+  //         Register(cls.id, cls.className);
+  //       }
+  //     });
+  //   } else {
+  //     toast.error("Class Not Available");
+  //   }
+  // };
+
   const handleClick = async () => {
     const classPresent = userData.classes.some(
       (cls) => cls.className === studentClass
@@ -43,36 +62,58 @@ function Students({ toast }) {
     }
   };
 
-  const Register = (clsId, className) => {
-    createUserWithEmailAndPassword(
-      auth,
-      studentLoginEmail,
-      studentLoginPassword
-    )
-      .then(async (userCredential) => {
-        const user = userCredential.user;
-        await setDoc(doc(db, "users", user.uid), {
-          uid: user.uid,
-          displayName: studentName,
-          classId: clsId,
-          class: className,
-          loginEmail: studentLoginEmail,
-          timestamp: serverTimestamp(),
-          type: "student",
-        });
-        await updateDoc(doc(db, "school", currentUser.uid), {
-          students: arrayUnion({ name: studentName, uid: user.uid }),
-        });
-        await updateDoc(doc(db, "classes", clsId), {
-          students: arrayUnion({ name: studentName, uid: user.uid }),
-        });
-        // navigate("/login");
-      })
-      .catch((error) => {
-        const errorMessage = error.message;
-        toast.error(errorMessage);
-        // ..
+  // const Register = (clsId, className) => {
+  //   createUserWithEmailAndPassword(
+  //     auth,
+  //     studentLoginEmail,
+  //     studentLoginPassword
+  //   )
+  //     .then(async (userCredential) => {
+  //       const user = userCredential.user;
+  //       await setDoc(doc(db, "users", user.uid), {
+  //         uid: user.uid,
+  //         displayName: studentName,
+  //         classId: clsId,
+  //         class: className,
+  //         loginEmail: studentLoginEmail,
+  //         timestamp: serverTimestamp(),
+  //         type: "student",
+  //       });
+  //       await updateDoc(doc(db, "school", currentUser.uid), {
+  //         students: arrayUnion({ name: studentName, uid: user.uid }),
+  //       });
+  //       await updateDoc(doc(db, "classes", clsId), {
+  //         students: arrayUnion({ name: studentName, uid: user.uid }),
+  //       });
+  //       // navigate("/login");
+  //     })
+  //     .catch((error) => {
+  //       const errorMessage = error.message;
+  //       toast.error(errorMessage);
+  //       // ..
+  //     });
+  // };
+
+  const Register = async (clsId, className) => {
+    try {
+      const docRef = await addDoc(collection(db, "users"), {
+        displayName: studentName,
+        classId: clsId,
+        class: className,
+        loginEmail: studentLoginEmail,
+        timestamp: serverTimestamp(),
+        type: "student",
       });
+      await updateDoc(doc(db, "school", currentUser.uid), {
+        students: arrayUnion({ name: studentName, uid: docRef.id }),
+      });
+      await updateDoc(doc(db, "classes", clsId), {
+        students: arrayUnion({ name: studentName, uid: docRef.id }),
+      });
+    } catch (error) {
+      const errorMessage = error.message;
+      console.log(errorMessage);
+    }
   };
 
   useEffect(() => {
@@ -83,15 +124,35 @@ function Students({ toast }) {
           console.log(schoolData.data());
 
           if (schoolData.exists()) {
-            const newTeachersArray = await Promise.all(
+            const newStudentssArray = await Promise.all(
               schoolData.data().students.map(async (student) => {
                 const docData = await getDoc(doc(db, "users", student.uid));
                 return docData.data();
               })
             );
 
-            setStudent(newTeachersArray); // Update the state directly
+            setStudent(newStudentssArray); // Update the state directly
             setClassesAvailable(true);
+
+            const unsub = onSnapshot(
+              doc(db, "school", currentUser.uid),
+              async (schoolDoc) => {
+                const newStudentssArray = await Promise.all(
+                  schoolDoc.data().students.map(async (students) => {
+                    const docData = await getDoc(
+                      doc(db, "users", students.uid)
+                    );
+                    return docData.data();
+                  })
+                );
+                setStudent(newStudentssArray);
+                setClassesAvailable(true);
+              }
+            );
+
+            return () => {
+              unsub();
+            };
           } else {
             setClassesAvailable(false);
           }
@@ -135,12 +196,12 @@ function Students({ toast }) {
               variant="outlined"
               onChange={(e) => setStudentLoginEmail(e.target.value)}
             />
-            <TextField
+            {/* <TextField
               id="outlined-basic"
               label="Student Login Password"
               variant="outlined"
               onChange={(e) => setStudentLoginPassword(e.target.value)}
-            />
+            /> */}
           </InputDiv>
           <ButtonDiv>
             <Button variant="contained" color="success" onClick={handleClick}>

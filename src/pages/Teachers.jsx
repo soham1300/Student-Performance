@@ -12,6 +12,7 @@ import {
   arrayUnion,
   collection,
   addDoc,
+  onSnapshot,
 } from "firebase/firestore";
 import { UserContext } from "../context/UserContex";
 import { db, auth } from "../DB/FirebaseConfig";
@@ -46,6 +47,7 @@ function Teachers({ toast }) {
           Register(cls.id, cls.className);
         }
       });
+      setAddTeacher(false);
     } else {
       toast.error("Class Not Available");
     }
@@ -80,7 +82,6 @@ function Teachers({ toast }) {
   //       // ..
   //     });
   // };
-
   const Register = async (clsId, className) => {
     try {
       const docRef = await addDoc(collection(db, "users"), {
@@ -91,9 +92,14 @@ function Teachers({ toast }) {
         timestamp: serverTimestamp(),
         type: "teacher",
       });
+
       await updateDoc(doc(db, "school", currentUser.uid), {
-        teachers: arrayUnion({ name: teacherName, uid: docRef.uid }),
+        teachers: arrayUnion({ name: teacherName, uid: docRef.id }),
       });
+
+      // const docData = await getDoc(doc(db, "users", docRef.uid));
+
+      // teachers.push(docData.data());
     } catch (error) {
       const errorMessage = error.message;
       console.log(errorMessage);
@@ -126,8 +132,26 @@ function Teachers({ toast }) {
               })
             );
 
-            setTeachers(newTeachersArray); // Update the state directly
+            setTeachers(newTeachersArray);
             setClassesAvailable(true);
+
+            const unsub = onSnapshot(
+              doc(db, "school", currentUser.uid),
+              async (schoolDoc) => {
+                const newTeachersArray = await Promise.all(
+                  schoolDoc.data().teachers.map(async (teacher) => {
+                    const docData = await getDoc(doc(db, "users", teacher.uid));
+                    return docData.data();
+                  })
+                );
+                setTeachers(newTeachersArray);
+                setClassesAvailable(true);
+              }
+            );
+
+            return () => {
+              unsub();
+            };
           } else {
             setClassesAvailable(false);
           }
