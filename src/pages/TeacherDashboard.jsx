@@ -18,11 +18,28 @@ import { AuthContext } from "../context/AuthContext";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { useNavigate } from "react-router-dom";
 import AttendanceGraph from "../component/AttendanceGraph";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionItemHeading,
+  AccordionItemButton,
+  AccordionItemPanel,
+} from "react-accessible-accordion";
+import "react-accessible-accordion/dist/fancy-example.css";
 
 function TeacherDashboard() {
   const [classData, setClassData] = useState(null);
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [assignments, setAssignments] = useState({
+    English: [],
+    Maths: [],
+    Science: [],
+    History: [],
+    Geography: [],
+    Hindi: [],
+    Marathi: [],
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,6 +56,20 @@ function TeacherDashboard() {
         if (classSnap.exists()) {
           console.log("Document data:", classSnap.data());
           setClassData(classSnap.data());
+          // Move assignment processing here
+          const newAssignments = {
+            English: [],
+            Maths: [],
+            Science: [],
+            History: [],
+            Geography: [],
+            Hindi: [],
+            Marathi: [],
+          };
+          classSnap.data().assignments.forEach((assignment) => {
+            newAssignments[assignment.subject].push(assignment);
+          });
+          setAssignments(newAssignments);
         } else {
           console.log("No such document!");
         }
@@ -78,7 +109,7 @@ function TeacherDashboard() {
               <MdOutlineAssignment size={42} />
               Assignments
               <ClassDataBoxData>
-                {classData.assignments ? classData.assignments : "-"}
+                {classData.assignments ? classData.assignments.length : "-"}
               </ClassDataBoxData>
             </ClassDataBox>
           </ClassDataBoxDiv>
@@ -102,27 +133,29 @@ function TeacherDashboard() {
               </AddAss>
             </AssignmentTop>
             <AssignmentDataDiv>
-              <AssignmentData>
-                <AssignmentDataTitle>English</AssignmentDataTitle>
-              </AssignmentData>
-              <AssignmentData>
-                <AssignmentDataTitle>Hindi</AssignmentDataTitle>
-              </AssignmentData>
-              <AssignmentData>
-                <AssignmentDataTitle>Marathi</AssignmentDataTitle>
-              </AssignmentData>
-              <AssignmentData>
-                <AssignmentDataTitle>Science</AssignmentDataTitle>
-              </AssignmentData>
-              <AssignmentData>
-                <AssignmentDataTitle>Maths</AssignmentDataTitle>
-              </AssignmentData>
-              <AssignmentData>
-                <AssignmentDataTitle>History</AssignmentDataTitle>
-              </AssignmentData>
-              <AssignmentData>
-                <AssignmentDataTitle>Geography</AssignmentDataTitle>
-              </AssignmentData>
+              {assignments &&
+                Object.entries(assignments).map(
+                  ([subject, assignmentsArray]) => (
+                    <AssignmentData key={subject}>
+                      <AssignmentDataTitle>{subject}</AssignmentDataTitle>
+                      <Accordion>
+                        {assignmentsArray &&
+                          assignmentsArray.map((assignment, index) => (
+                            <AccordionItem key={index} style={{ width: "95%" }}>
+                              <AccordionItemHeading>
+                                <AccordionItemButton>
+                                  {assignment.title}
+                                </AccordionItemButton>
+                              </AccordionItemHeading>
+                              <AccordionItemPanel>
+                                <p>{assignment.assignment}</p>
+                              </AccordionItemPanel>
+                            </AccordionItem>
+                          ))}
+                      </Accordion>
+                    </AssignmentData>
+                  )
+                )}
             </AssignmentDataDiv>
           </AssignmentDiv>
         </>
@@ -205,7 +238,7 @@ const AssignmentDataDiv = styled.div`
 
 const AssignmentData = styled.div`
   width: 90%;
-  height: 100px;
+  min-height: 100px;
   margin: 20px;
   border-radius: 5px;
   text-align: center;

@@ -1,12 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import styled from "styled-components";
 import Button from "@mui/material/Button";
 import SendIcon from "@mui/icons-material/Send";
+import {
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+  arrayUnion,
+} from "firebase/firestore";
+import { db } from "../DB/FirebaseConfig";
+import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
-function AddAssignment() {
-  const [subject, setSubject] = useState("");
+function AddAssignment({ toast }) {
+  const [subject, setSubject] = useState("English");
   const [title, setTitle] = useState("");
   const [assignment, setAssignment] = useState("");
+  const [finalDate, setFinalDate] = useState("");
+  const { currentUser } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const handleSubjectChange = (e) => {
     setSubject(e.target.value);
@@ -20,8 +36,43 @@ function AddAssignment() {
     setAssignment(e.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleDateChange = (e) => {
+    setFinalDate(e.target.value);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (subject && title && assignment) {
+      const currentDate = new Date();
+      const date = currentDate.toISOString().split("T")[0];
+      const assignmentData = {
+        subject: subject,
+        title: title,
+        assignment: assignment,
+        dateAssigned: date,
+        lastDate: finalDate,
+        submitted: [],
+      };
+      try {
+        const q = query(
+          collection(db, "users"),
+          where("uid", "==", currentUser.uid)
+        );
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach(async (document) => {
+          console.log(document.id, " => ", document.data());
+          const classDoc = doc(db, "classes", document.data().classId);
+          await updateDoc(classDoc, {
+            assignments: arrayUnion(assignmentData),
+          });
+        });
+        navigate(-1);
+      } catch (error) {
+        toast.error("Something went wrong");
+      }
+    } else {
+      toast.error("Please fill all the fields");
+    }
     // call API to add assignment
   };
 
@@ -59,15 +110,25 @@ function AddAssignment() {
             type="text"
             placeholder="Enter assignment title"
             onChange={handleTitleChange}
+            required
           />
         </Label>
-
+        <Label>
+          Last Date of Submission :{" "}
+          <input
+            type="date"
+            id="startDate"
+            onChange={handleDateChange}
+            required
+          ></input>
+        </Label>
         <AssignmentLabel>
           Assignment
           {/* <textarea value={assignment} /> */}
           <StyledTextArea
             placeholder="Enter your assignment details here"
             onChange={handleAssignmentChange}
+            required
           ></StyledTextArea>
         </AssignmentLabel>
         <SendBtnDiv>
