@@ -27,657 +27,63 @@ function Class() {
     };
     fetchData();
   }, [classId]);
-  const studentAttendanceData = [
-    {
-      id: 1,
-      studentName: "Student 1 Doe",
-      date: "2024-01-17",
-      attendance: "Present",
-    },
-    {
-      id: 1,
-      studentName: "Student 1 Doe",
-      date: "2024-01-31",
-      attendance: "Present",
-    },
-    {
-      id: 1,
-      studentName: "Student 1 Doe",
-      date: "2024-01-31",
-      attendance: "Present",
-    },
-    {
-      id: 1,
-      studentName: "Student 1 Doe",
-      date: "2024-01-16",
-      attendance: "Present",
-    },
-    {
-      id: 2,
-      studentName: "Student 2 Doe",
-      date: "2024-01-02",
-      attendance: "Present",
-    },
-    {
-      id: 2,
-      studentName: "Student 2 Doe",
-      date: "2024-01-25",
-      attendance: "Absent",
-    },
-    {
-      id: 2,
-      studentName: "Student 2 Doe",
-      date: "2024-01-29",
-      attendance: "Present",
-    },
-    {
-      id: 2,
-      studentName: "Student 2 Doe",
-      date: "2024-01-13",
-      attendance: "Present",
-    },
-    {
-      id: 3,
-      studentName: "Student 3 Doe",
-      date: "2024-01-31",
-      attendance: "Present",
-    },
-    {
-      id: 3,
-      studentName: "Student 3 Doe",
-      date: "2024-01-15",
-      attendance: "Absent",
-    },
-    {
-      id: 3,
-      studentName: "Student 3 Doe",
-      date: "2024-01-10",
-      attendance: "Present",
-    },
-    {
-      id: 3,
-      studentName: "Student 3 Doe",
-      date: "2024-01-04",
-      attendance: "Present",
-    },
-    {
-      id: 4,
-      studentName: "Student 4 Doe",
-      date: "2024-01-24",
-      attendance: "Absent",
-    },
-    {
-      id: 4,
-      studentName: "Student 4 Doe",
-      date: "2024-01-23",
-      attendance: "Absent",
-    },
-    {
-      id: 4,
-      studentName: "Student 4 Doe",
-      date: "2024-01-29",
-      attendance: "Present",
-    },
-    {
-      id: 4,
-      studentName: "Student 4 Doe",
-      date: "2024-01-10",
-      attendance: "Present",
-    },
-    {
-      id: 5,
-      studentName: "Student 5 Doe",
-      date: "2024-01-30",
-      attendance: "Present",
-    },
-    {
-      id: 5,
-      studentName: "Student 5 Doe",
-      date: "2024-01-09",
-      attendance: "Present",
-    },
-    {
-      id: 5,
-      studentName: "Student 5 Doe",
-      date: "2024-01-08",
-      attendance: "Present",
-    },
-    {
-      id: 5,
-      studentName: "Student 5 Doe",
-      date: "2024-01-15",
-      attendance: "Present",
-    },
-    {
-      id: 6,
-      studentName: "Student 6 Doe",
-      date: "2024-01-07",
-      attendance: "Present",
-    },
-    {
-      id: 6,
-      studentName: "Student 6 Doe",
-      date: "2024-01-25",
-      attendance: "Present",
-    },
-    {
-      id: 6,
-      studentName: "Student 6 Doe",
-      date: "2024-01-21",
-      attendance: "Present",
-    },
-    {
-      id: 6,
-      studentName: "Student 6 Doe",
-      date: "2024-01-11",
-      attendance: "Present",
-    },
-    {
-      id: 7,
-      studentName: "Student 7 Doe",
-      date: "2024-01-21",
-      attendance: "Present",
-    },
-    {
-      id: 7,
-      studentName: "Student 7 Doe",
-      date: "2024-01-11",
-      attendance: "Present",
-    },
-    {
-      id: 7,
-      studentName: "Student 7 Doe",
-      date: "2024-01-16",
-      attendance: "Present",
-    },
-    {
-      id: 7,
-      studentName: "Student 7 Doe",
-      date: "2024-01-21",
-      attendance: "Present",
-    },
-    {
-      id: 8,
-      studentName: "Student 8 Doe",
-      date: "2024-01-09",
-      attendance: "Present",
-    },
-    {
-      id: 8,
-      studentName: "Student 8 Doe",
-      date: "2024-01-09",
-      attendance: "Present",
-    },
-    {
-      id: 8,
-      studentName: "Student 8 Doe",
-      date: "2024-01-03",
-      attendance: "Present",
-    },
-    {
-      id: 8,
-      studentName: "Student 8 Doe",
-      date: "2024-01-23",
-      attendance: "Present",
-    },
-    {
-      id: 9,
-      studentName: "Student 9 Doe",
-      date: "2024-01-07",
-      attendance: "Present",
-    },
-    {
-      id: 9,
-      studentName: "Student 9 Doe",
-      date: "2024-01-25",
-      attendance: "Present",
-    },
-    {
-      id: 9,
-      studentName: "Student 9 Doe",
-      date: "2024-01-25",
-      attendance: "Present",
-    },
-    {
-      id: 9,
-      studentName: "Student 9 Doe",
-      date: "2024-01-06",
-      attendance: "Present",
-    },
-    {
-      id: 10,
-      studentName: "Student 10 Doe",
-      date: "2024-01-08",
-      attendance: "Absent",
-    },
-    {
-      id: 10,
-      studentName: "Student 10 Doe",
-      date: "2024-01-15",
-      attendance: "Present",
-    },
-    {
-      id: 10,
-      studentName: "Student 10 Doe",
-      date: "2024-01-25",
-      attendance: "Present",
-    },
-    {
-      id: 10,
-      studentName: "Student 10 Doe",
-      date: "2024-01-22",
-      attendance: "Present",
-    },
-    {
-      id: 11,
-      studentName: "Student 11 Doe",
-      date: "2024-01-23",
-      attendance: "Present",
-    },
-    {
-      id: 11,
-      studentName: "Student 11 Doe",
-      date: "2024-01-30",
-      attendance: "Present",
-    },
-    {
-      id: 11,
-      studentName: "Student 11 Doe",
-      date: "2024-01-25",
-      attendance: "Present",
-    },
-    {
-      id: 11,
-      studentName: "Student 11 Doe",
-      date: "2024-01-24",
-      attendance: "Present",
-    },
-    {
-      id: 12,
-      studentName: "Student 12 Doe",
-      date: "2024-01-29",
-      attendance: "Present",
-    },
-    {
-      id: 12,
-      studentName: "Student 12 Doe",
-      date: "2024-01-29",
-      attendance: "Present",
-    },
-    {
-      id: 12,
-      studentName: "Student 12 Doe",
-      date: "2024-01-17",
-      attendance: "Present",
-    },
-    {
-      id: 12,
-      studentName: "Student 12 Doe",
-      date: "2024-01-23",
-      attendance: "Present",
-    },
-    {
-      id: 13,
-      studentName: "Student 13 Doe",
-      date: "2024-01-11",
-      attendance: "Absent",
-    },
-    {
-      id: 13,
-      studentName: "Student 13 Doe",
-      date: "2024-01-03",
-      attendance: "Present",
-    },
-    {
-      id: 13,
-      studentName: "Student 13 Doe",
-      date: "2024-01-05",
-      attendance: "Present",
-    },
-    {
-      id: 13,
-      studentName: "Student 13 Doe",
-      date: "2024-01-22",
-      attendance: "Absent",
-    },
-    {
-      id: 14,
-      studentName: "Student 14 Doe",
-      date: "2024-01-19",
-      attendance: "Present",
-    },
-    {
-      id: 14,
-      studentName: "Student 14 Doe",
-      date: "2024-01-12",
-      attendance: "Absent",
-    },
-    {
-      id: 14,
-      studentName: "Student 14 Doe",
-      date: "2024-01-29",
-      attendance: "Present",
-    },
-    {
-      id: 14,
-      studentName: "Student 14 Doe",
-      date: "2024-01-30",
-      attendance: "Present",
-    },
-    {
-      id: 15,
-      studentName: "Student 15 Doe",
-      date: "2024-01-22",
-      attendance: "Present",
-    },
-    {
-      id: 15,
-      studentName: "Student 15 Doe",
-      date: "2024-01-02",
-      attendance: "Present",
-    },
-    {
-      id: 15,
-      studentName: "Student 15 Doe",
-      date: "2024-01-29",
-      attendance: "Absent",
-    },
-    {
-      id: 15,
-      studentName: "Student 15 Doe",
-      date: "2024-01-17",
-      attendance: "Present",
-    },
-    {
-      id: 16,
-      studentName: "Student 16 Doe",
-      date: "2024-01-20",
-      attendance: "Present",
-    },
-    {
-      id: 16,
-      studentName: "Student 16 Doe",
-      date: "2024-01-05",
-      attendance: "Present",
-    },
-    {
-      id: 16,
-      studentName: "Student 16 Doe",
-      date: "2024-01-22",
-      attendance: "Absent",
-    },
-    {
-      id: 16,
-      studentName: "Student 16 Doe",
-      date: "2024-01-16",
-      attendance: "Present",
-    },
-    {
-      id: 17,
-      studentName: "Student 17 Doe",
-      date: "2024-01-05",
-      attendance: "Present",
-    },
-    {
-      id: 17,
-      studentName: "Student 17 Doe",
-      date: "2024-01-21",
-      attendance: "Present",
-    },
-    {
-      id: 17,
-      studentName: "Student 17 Doe",
-      date: "2024-01-06",
-      attendance: "Present",
-    },
-    {
-      id: 17,
-      studentName: "Student 17 Doe",
-      date: "2024-01-28",
-      attendance: "Present",
-    },
-    {
-      id: 18,
-      studentName: "Student 18 Doe",
-      date: "2024-01-13",
-      attendance: "Present",
-    },
-    {
-      id: 18,
-      studentName: "Student 18 Doe",
-      date: "2024-01-13",
-      attendance: "Absent",
-    },
-    {
-      id: 18,
-      studentName: "Student 18 Doe",
-      date: "2024-01-11",
-      attendance: "Present",
-    },
-    {
-      id: 18,
-      studentName: "Student 18 Doe",
-      date: "2024-01-05",
-      attendance: "Present",
-    },
-    {
-      id: 19,
-      studentName: "Student 19 Doe",
-      date: "2024-01-08",
-      attendance: "Absent",
-    },
-    {
-      id: 19,
-      studentName: "Student 19 Doe",
-      date: "2024-01-17",
-      attendance: "Present",
-    },
-    {
-      id: 19,
-      studentName: "Student 19 Doe",
-      date: "2024-01-09",
-      attendance: "Present",
-    },
-    {
-      id: 19,
-      studentName: "Student 19 Doe",
-      date: "2024-01-07",
-      attendance: "Present",
-    },
-    {
-      id: 20,
-      studentName: "Student 20 Doe",
-      date: "2024-01-25",
-      attendance: "Absent",
-    },
-    {
-      id: 20,
-      studentName: "Student 20 Doe",
-      date: "2024-01-05",
-      attendance: "Present",
-    },
-    {
-      id: 20,
-      studentName: "Student 20 Doe",
-      date: "2024-01-26",
-      attendance: "Present",
-    },
-    {
-      id: 20,
-      studentName: "Student 20 Doe",
-      date: "2024-01-09",
-      attendance: "Absent",
-    },
-    {
-      id: 21,
-      studentName: "Student 21 Doe",
-      date: "2024-01-23",
-      attendance: "Present",
-    },
-    {
-      id: 21,
-      studentName: "Student 21 Doe",
-      date: "2024-01-23",
-      attendance: "Present",
-    },
-    {
-      id: 21,
-      studentName: "Student 21 Doe",
-      date: "2024-01-26",
-      attendance: "Absent",
-    },
-    {
-      id: 21,
-      studentName: "Student 21 Doe",
-      date: "2024-01-20",
-      attendance: "Present",
-    },
-    {
-      id: 22,
-      studentName: "Student 22 Doe",
-      date: "2024-01-09",
-      attendance: "Absent",
-    },
-    {
-      id: 22,
-      studentName: "Student 22 Doe",
-      date: "2024-01-26",
-      attendance: "Present",
-    },
-    {
-      id: 22,
-      studentName: "Student 22 Doe",
-      date: "2024-01-19",
-      attendance: "Absent",
-    },
-    {
-      id: 22,
-      studentName: "Student 22 Doe",
-      date: "2024-01-07",
-      attendance: "Present",
-    },
-    {
-      id: 23,
-      studentName: "Student 23 Doe",
-      date: "2024-01-01",
-      attendance: "Absent",
-    },
-    {
-      id: 23,
-      studentName: "Student 23 Doe",
-      date: "2024-01-26",
-      attendance: "Present",
-    },
-    {
-      id: 23,
-      studentName: "Student 23 Doe",
-      date: "2024-01-10",
-      attendance: "Present",
-    },
-    {
-      id: 23,
-      studentName: "Student 23 Doe",
-      date: "2024-01-12",
-      attendance: "Absent",
-    },
-    {
-      id: 24,
-      studentName: "Student 24 Doe",
-      date: "2024-01-14",
-      attendance: "Present",
-    },
-    {
-      id: 24,
-      studentName: "Student 24 Doe",
-      date: "2024-01-12",
-      attendance: "Present",
-    },
-    {
-      id: 24,
-      studentName: "Student 24 Doe",
-      date: "2024-01-09",
-      attendance: "Absent",
-    },
-    {
-      id: 24,
-      studentName: "Student 24 Doe",
-      date: "2024-01-29",
-      attendance: "Present",
-    },
-    {
-      id: 25,
-      studentName: "Student 25 Doe",
-      date: "2024-01-11",
-      attendance: "Present",
-    },
-    {
-      id: 25,
-      studentName: "Student 25 Doe",
-      date: "2024-01-27",
-      attendance: "Present",
-    },
-    {
-      id: 25,
-      studentName: "Student 25 Doe",
-      date: "2024-01-03",
-      attendance: "Present",
-    },
-    {
-      id: 25,
-      studentName: "Student 25 Doe",
-      date: "2024-01-02",
-      attendance: "Present",
-    },
-  ];
+  if (!classData) {
+    return <p>Loading....</p>;
+  }
 
   // Extract unique dates from the data
-  const uniqueDates = [
-    ...new Set(studentAttendanceData.map((row) => row.date)),
-  ];
+  const uniqueDates = classData.attendance
+    ? [...new Set(classData.attendance.map((row) => row.date))]
+    : [];
 
   // Create columns dynamically based on unique dates
+  // Create columns dynamically based on unique dates
+  // Create columns dynamically based on unique dates
   const columns = [
-    { field: "id", headerName: "Roll no.", width: 70 },
-    { field: "studentName", headerName: "Student Name", width: 130 },
+    { field: "rollNo", headerName: "RollNo", width: 90 },
+    { field: "studentName", headerName: "Student Name", width: 150 },
     ...uniqueDates.map((date) => ({
       field: date,
-      headerName: date,
+      headerName: new Date(date).toLocaleDateString("en-US", {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+      }),
       width: 120,
     })),
   ];
 
   // Create rows with attendance data
-  const rows = studentAttendanceData.reduce((acc, row) => {
-    const existingRow = acc.find((r) => r.id === row.id);
+  const rows = [];
+  classData.attendance?.forEach((row, index) => {
+    const existingRow = rows.find((r) => r.id === row.id);
     if (existingRow) {
+      // Update existing row with attendance for the current date
       existingRow[row.date] = row.attendance;
     } else {
+      // Create a new row with the student id as the unique id
       const newRow = {
-        id: row.id,
-        studentName: row.studentName,
+        id: row.id, // Use the student id as the unique id
+        rollNo: index,
+        studentName: row.name,
         [row.date]: row.attendance,
       };
-      acc.push(newRow);
+      rows.push(newRow);
     }
-    return acc;
-  }, []);
+  });
 
   const DataTable = () => {
     return (
       <div
         style={{
           width: "86vw",
-          height: "80vh",
+          maxHeight: "80vh",
         }}
       >
         <DataGrid rows={rows} columns={columns} />
       </div>
     );
   };
-
-  if (!classData) {
-    return <p>Loading....</p>;
-  }
 
   return (
     <ClassDiv>
@@ -696,14 +102,14 @@ function Class() {
           <PiStudent size={42} />
           Total Students
           <ClassDataBoxData>
-            {classData.students ? classData.students : "-"}
+            {classData.students ? classData.students.length : "-"}
           </ClassDataBoxData>
         </ClassDataBox>
         <ClassDataBox>
           <PiChartScatter size={42} />
           Avg. Attendance
           <ClassDataBoxData>
-            {classData.Attendance ? classData.Attendance : "-"}
+            {classData.attendance ? classData.attendance.length : "-"}
           </ClassDataBoxData>
         </ClassDataBox>
         <ClassDataBox>
@@ -716,7 +122,7 @@ function Class() {
       </ClassDataBoxDiv>
       <AttendanceTableText>Attendance</AttendanceTableText>
       {/* <AttendanceTable data={studentAttendanceData} /> */}
-      <DataTable />
+      {classData.attendance && <DataTable />}
     </ClassDiv>
   );
 }

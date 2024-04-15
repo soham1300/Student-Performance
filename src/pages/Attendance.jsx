@@ -29,7 +29,7 @@ function Attendance() {
   const [classId, setClassId] = useState();
   const navigate = useNavigate();
 
-  const markAttendance = (studentName, status) => {
+  const markAttendance = (studentName, id, status) => {
     const updatedAttendance = [...attendance];
     let today = new Date().toISOString().slice(0, 10);
     const existingIndex = updatedAttendance.findIndex(
@@ -42,6 +42,7 @@ function Attendance() {
         name: studentName,
         attendance: status,
         date: today,
+        id: id,
       });
     }
 
@@ -131,7 +132,7 @@ function Attendance() {
                   <BtnDiv>
                     <PresentBtn
                       onClick={() => {
-                        markAttendance(student.name, "Present");
+                        markAttendance(student.name, student.uid, "Present");
                       }}
                       selected={attendanceStatus[student.name] === "green"}
                     >
@@ -139,7 +140,7 @@ function Attendance() {
                     </PresentBtn>
                     <AbsentBtn
                       onClick={() => {
-                        markAttendance(student.name, "Absent");
+                        markAttendance(student.name, student.uid, "Absent");
                       }}
                       selected={attendanceStatus[student.name] === "red"}
                     >

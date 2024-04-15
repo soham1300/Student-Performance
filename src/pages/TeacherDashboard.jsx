@@ -17,7 +17,7 @@ import {
 import { AuthContext } from "../context/AuthContext";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { useNavigate } from "react-router-dom";
-import { Line } from "react-chartjs-2";
+import AttendanceGraph from "../component/AttendanceGraph";
 
 function TeacherDashboard() {
   const [classData, setClassData] = useState(null);
@@ -89,7 +89,42 @@ function TeacherDashboard() {
                 Take Attendance <KeyboardArrowRightIcon fontSize="large" />
               </TakeAtt>
             </AttendanceTop>
+            <AttendanceGraph
+              attendanceData={classData.attendance}
+              totalStudents={classData.students ? classData.students.length : 0}
+            />
           </AttendanceDiv>
+          <AssignmentDiv>
+            <AssignmentTop>
+              <Title>Assignment</Title>
+              <AddAss onClick={() => navigate("/addassignment")}>
+                Add Assignment <KeyboardArrowRightIcon fontSize="large" />
+              </AddAss>
+            </AssignmentTop>
+            <AssignmentDataDiv>
+              <AssignmentData>
+                <AssignmentDataTitle>English</AssignmentDataTitle>
+              </AssignmentData>
+              <AssignmentData>
+                <AssignmentDataTitle>Hindi</AssignmentDataTitle>
+              </AssignmentData>
+              <AssignmentData>
+                <AssignmentDataTitle>Marathi</AssignmentDataTitle>
+              </AssignmentData>
+              <AssignmentData>
+                <AssignmentDataTitle>Science</AssignmentDataTitle>
+              </AssignmentData>
+              <AssignmentData>
+                <AssignmentDataTitle>Maths</AssignmentDataTitle>
+              </AssignmentData>
+              <AssignmentData>
+                <AssignmentDataTitle>History</AssignmentDataTitle>
+              </AssignmentData>
+              <AssignmentData>
+                <AssignmentDataTitle>Geography</AssignmentDataTitle>
+              </AssignmentData>
+            </AssignmentDataDiv>
+          </AssignmentDiv>
         </>
       )}
     </TeacherDashboardDiv>
@@ -154,4 +189,34 @@ const TakeAtt = styled.p`
   &:hover {
     text-decoration: underline;
   }
+`;
+
+const AssignmentDiv = styled.div``;
+
+const AssignmentTop = styled(AttendanceTop)``;
+
+const AddAss = styled(TakeAtt)``;
+
+const AssignmentDataDiv = styled.div`
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto auto auto;
+`;
+
+const AssignmentData = styled.div`
+  width: 90%;
+  height: 100px;
+  margin: 20px;
+  border-radius: 5px;
+  text-align: center;
+  border: 1px solid #2e3b55;
+`;
+
+const AssignmentDataTitle = styled.div`
+  width: 100%;
+  color: white;
+  background-color: #2e3b55;
+  padding: 12px 0;
+  font-weight: bold;
+  /* border-radius: 5px 0 0 5px; */
 `;

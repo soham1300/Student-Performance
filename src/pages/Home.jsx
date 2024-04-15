@@ -8,6 +8,7 @@ import resultImg from "../images/result.png";
 import progImg from "../images/prog graph.png";
 import examImg from "../images/exam comment.png";
 import attendImg from "../images/attendance.png";
+import HomeImg from "../images/Home.svg";
 
 function Home() {
   return (
@@ -21,6 +22,7 @@ function Home() {
             tracking.
           </MainTextSubTitle>
         </MainText>
+        <img alt="" src={HomeImg} />
       </MainDiv>
       <About id="about">
         <AboutTitle>About Student Performance Tracking Tool</AboutTitle>
@@ -143,6 +145,7 @@ const MainText = styled.div`
 
 const MainTextTitle = styled.p`
   font-size: 5rem;
+  margin: 0 10%;
 `;
 
 const MainTextSubTitle = styled.p`
@@ -211,7 +214,11 @@ const FeaturesImgDiv = styled.div`
   width: 40vw;
 `;
 
-const MainDiv = styled.div``;
+const MainDiv = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
 const Area = styled.div`
   background: #4e54c8;
