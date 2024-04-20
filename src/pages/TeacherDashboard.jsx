@@ -4,7 +4,7 @@ import { GiTeacher } from "react-icons/gi";
 import { PiStudent } from "react-icons/pi";
 import { PiChartScatter } from "react-icons/pi";
 import { MdOutlineAssignment } from "react-icons/md";
-import { db } from "../DB/FirebaseConfig";
+import { db, auth } from "../DB/FirebaseConfig";
 import {
   doc,
   getDoc,
@@ -26,8 +26,10 @@ import {
   AccordionItemPanel,
 } from "react-accessible-accordion";
 import "react-accessible-accordion/dist/fancy-example.css";
+import Button from "@mui/material/Button";
+import { signOut } from "firebase/auth";
 
-function TeacherDashboard() {
+function TeacherDashboard({ toast }) {
   const [classData, setClassData] = useState(null);
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -82,7 +84,30 @@ function TeacherDashboard() {
     <TeacherDashboardDiv>
       {classData && (
         <>
-          <Title>Teacher Dashboard</Title> <hr />
+          <TitleBarDiv>
+            <Title>Teacher Dashboard</Title>
+            {/* <LogoutButton onClick={() => navigate("/")}> */}
+            <Button
+              variant="contained"
+              color="error"
+              size="large"
+              onClick={() =>
+                signOut(auth)
+                  .then(() => {
+                    navigate("/");
+                  })
+                  .catch((error) => {
+                    toast.error(error.message);
+                  })
+              }
+              style={{
+                margin: "0 1rem",
+              }}
+            >
+              Logout
+            </Button>
+          </TitleBarDiv>
+          <hr />
           <ClassDataBoxDiv>
             <ClassDataBox>
               <GiTeacher size={42} />
@@ -116,9 +141,14 @@ function TeacherDashboard() {
           <AttendanceDiv>
             <AttendanceTop>
               <Title>Attendance</Title>
-              <TakeAtt onClick={() => navigate("/attendance")}>
-                Take Attendance <KeyboardArrowRightIcon fontSize="large" />
-              </TakeAtt>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <TakeAtt onClick={() => navigate("/showattendance")}>
+                  Show Attendance
+                </TakeAtt>
+                <TakeAtt onClick={() => navigate("/attendance")}>
+                  Take Attendance <KeyboardArrowRightIcon fontSize="large" />
+                </TakeAtt>
+              </div>
             </AttendanceTop>
             <AttendanceGraph
               attendanceData={classData.attendance}
@@ -252,4 +282,11 @@ const AssignmentDataTitle = styled.div`
   padding: 12px 0;
   font-weight: bold;
   /* border-radius: 5px 0 0 5px; */
+`;
+
+const TitleBarDiv = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
 `;

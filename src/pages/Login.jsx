@@ -14,6 +14,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { signOut } from "firebase/auth";
 
 function Login({ toast }) {
   const [isParantLogin, setIsParentLogin] = useState(true);
@@ -52,7 +53,25 @@ function Login({ toast }) {
             }
           });
         } else {
-          navigate("/admin/classes");
+          const q = query(
+            collection(db, "school"),
+            where("uid", "==", user.uid)
+          );
+          const querySnapshot = await getDocs(q);
+          console.log(querySnapshot);
+          if (querySnapshot.empty) {
+            toast.error("Please login as a School Administrator");
+            signOut(auth);
+          } else {
+            querySnapshot.forEach(async (doc) => {
+              if (doc.data().adminName) {
+                navigate("/admin/classes");
+              } else {
+                toast.error("Please login as a School Administrator");
+                signOut(auth);
+              }
+            });
+          }
         }
       })
       .catch(async (error) => {
@@ -88,7 +107,6 @@ function Login({ toast }) {
         //             querySnapshot.forEach((doc) => {
         //               // doc.data() is never undefined for query doc snapshots
         //               console.log(doc.id, " => ", doc.data());
-
         //               if (doc.data().type === "teacher") {
         //                 navigate("/teacher");
         //               } else {
@@ -111,46 +129,47 @@ function Login({ toast }) {
         // } else {
         //   toast.error(error.code);
         // }
-
-        if (error.code === "auth/invalid-credential") {
-          const emailAvailable = await checkEmail();
-          if (emailAvailable) {
-            setParentRegister(true);
-            if (password === passwordConfirm) {
-              createUserWithEmailAndPassword(auth, email, password)
-                .then(async (userCredential) => {
-                  const user = userCredential.user;
-                  const q = query(
-                    collection(db, "users"),
-                    where("loginEmail", "==", email)
-                  );
-                  const querySnapshot = await getDocs(q);
-                  querySnapshot.forEach(async (doc) => {
-                    await updateDoc(doc.ref, {
-                      uid: user.uid,
-                    });
-                    if (isParantLogin) {
-                      if (doc.data().type === "teacher") {
-                        navigate("/teacher");
-                      } else {
-                        navigate("/student");
-                      }
-                    } else {
-                      navigate("/admin/classes");
-                    }
-                  });
-                })
-                .catch((error) => {
-                  const errorMessage = error.message;
-                  console.log(errorMessage);
-                });
-            } else {
-              toast.error("Password doesn't match");
-            }
-          }
-        } else {
-          toast.error(error.code);
-        }
+        //Useful code
+        // if (error.code === "auth/invalid-credential") {
+        //   const emailAvailable = await checkEmail();
+        //   if (emailAvailable) {
+        //     setParentRegister(true);
+        //     if (password === passwordConfirm) {
+        //       createUserWithEmailAndPassword(auth, email, password)
+        //         .then(async (userCredential) => {
+        //           const user = userCredential.user;
+        //           const q = query(
+        //             collection(db, "users"),
+        //             where("loginEmail", "==", email)
+        //           );
+        //           const querySnapshot = await getDocs(q);
+        //           querySnapshot.forEach(async (doc) => {
+        //             await updateDoc(doc.ref, {
+        //               uid: user.uid,
+        //             });
+        //             if (isParantLogin) {
+        //               if (doc.data().type === "teacher") {
+        //                 navigate("/teacher");
+        //               } else {
+        //                 navigate("/student");
+        //               }
+        //             } else {
+        //               navigate("/admin/classes");
+        //             }
+        //           });
+        //         })
+        //         .catch((error) => {
+        //           const errorMessage = error.message;
+        //           console.log(errorMessage);
+        //         });
+        //     } else {
+        //       toast.error("Password doesn't match");
+        //     }
+        //   }
+        // } else {
+        //   toast.error(error.code);
+        // }
+        toast.error(error.code);
       });
   };
 

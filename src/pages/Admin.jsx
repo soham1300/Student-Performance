@@ -5,12 +5,14 @@ import Typography from "@mui/material/Typography";
 import { useLocation, Outlet, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../DB/FirebaseConfig";
+import { db, auth } from "../DB/FirebaseConfig";
 import Avatar from "@mui/material/Avatar";
 import { PiStudentBold } from "react-icons/pi";
 import { PiChalkboardTeacherBold } from "react-icons/pi";
 import { SiGoogleclassroom } from "react-icons/si";
 import { UserContext } from "../context/UserContex";
+import Button from "@mui/material/Button";
+import { signOut } from "firebase/auth";
 
 function Admin({ toast }) {
   const location = useLocation();
@@ -90,6 +92,25 @@ function Admin({ toast }) {
         <AdminTopBar>
           <AdminTopBarText>Admin Dashboard</AdminTopBarText>
           <AdminSchoolDetail>
+            <Button
+              variant="contained"
+              color="error"
+              size="large"
+              onClick={() =>
+                signOut(auth)
+                  .then(() => {
+                    navigate("/");
+                  })
+                  .catch((error) => {
+                    toast.error(error.message);
+                  })
+              }
+              style={{
+                margin: "0 1rem",
+              }}
+            >
+              Logout
+            </Button>
             <Avatar alt={userData.displayName} src={userData.photoURL} />
             <AdminSchoolName>{userData.displayName}</AdminSchoolName>
           </AdminSchoolDetail>

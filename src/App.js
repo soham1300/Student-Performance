@@ -16,6 +16,7 @@ import Class from "./pages/Class";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import Attendance from "./pages/Attendance";
 import AddAssignment from "./pages/AddAssignment";
+import ShowAttendance from "./pages/ShowAttendance";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
@@ -96,6 +97,14 @@ function App() {
           element={
             <ProtectedRoute>
               <AddAssignment toast={toast} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="showattendance"
+          element={
+            <ProtectedRoute>
+              <ShowAttendance toast={toast} />
             </ProtectedRoute>
           }
         />

@@ -1,32 +1,44 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import styled from "styled-components";
-import { useParams } from "react-router-dom";
-import { doc, getDoc } from "firebase/firestore";
 import { db } from "../DB/FirebaseConfig";
-import { GiTeacher } from "react-icons/gi";
-import { PiStudent } from "react-icons/pi";
-import { PiChartScatter } from "react-icons/pi";
-import { MdOutlineAssignment } from "react-icons/md";
+import {
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
+import { AuthContext } from "../context/AuthContext";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 
-function Class() {
-  const { classId } = useParams();
+function ShowAttendance() {
+  const { currentUser } = useContext(AuthContext);
   const [classData, setClassData] = useState();
 
   useEffect(() => {
     const fetchData = async () => {
-      const docRef = doc(db, "classes", classId);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        console.log("Document data:", docSnap.data());
-        setClassData(docSnap.data());
-      } else {
-        console.log("No such document!");
-      }
+      const q = query(
+        collection(db, "users"),
+        where("uid", "==", currentUser.uid)
+      );
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach(async (document) => {
+        console.log(document.id, " => ", document.data());
+        const classSnap = await getDoc(
+          doc(db, "classes", document.data().classId)
+        );
+        if (classSnap.exists()) {
+          console.log("Document data:", classSnap.data());
+          setClassData(classSnap.data());
+        } else {
+          console.log("No such document!");
+        }
+      });
     };
     fetchData();
-  }, [classId]);
+  }, [currentUser.uid]);
 
   if (!classData) {
     return <p>Loading....</p>;
@@ -89,41 +101,9 @@ function Class() {
   });
 
   return (
-    <ClassDiv>
-      <ClassNameText>
-        {classData && `Class ${classData.className}`}
-      </ClassNameText>
-      <ClassDataBoxDiv>
-        <ClassDataBox>
-          <GiTeacher size={42} />
-          Class Teacher
-          <ClassDataBoxData>
-            {classData.classTeacher ? classData.classTeacher : "-"}
-          </ClassDataBoxData>
-        </ClassDataBox>
-        <ClassDataBox>
-          <PiStudent size={42} />
-          Total Students
-          <ClassDataBoxData>
-            {classData.students ? classData.students.length : "-"}
-          </ClassDataBoxData>
-        </ClassDataBox>
-        <ClassDataBox>
-          <PiChartScatter size={42} />
-          Avg. Attendance
-          <ClassDataBoxData>
-            {classData.attendance ? classData.attendance.length : "-"}
-          </ClassDataBoxData>
-        </ClassDataBox>
-        <ClassDataBox>
-          <MdOutlineAssignment size={42} />
-          Assignments
-          <ClassDataBoxData>
-            {classData.assignments ? classData.assignments.length : "-"}
-          </ClassDataBoxData>
-        </ClassDataBox>
-      </ClassDataBoxDiv>
-      <AttendanceTableText>Attendance</AttendanceTableText>
+    <ShowAttendanceDiv>
+      <Title>Student Attendance</Title>
+      <hr />
       <div className="card">
         <DataTable
           value={rows}
@@ -156,49 +136,17 @@ function Class() {
           ))}
         </DataTable>
       </div>
-    </ClassDiv>
+    </ShowAttendanceDiv>
   );
 }
 
-export default Class;
+export default ShowAttendance;
 
-const ClassDiv = styled.div``;
+const ShowAttendanceDiv = styled.div``;
 
-const ClassNameText = styled.p`
-  margin: 0 12px;
-  font-size: 3rem;
-  font-weight: bold;
-  color: #2e3b55;
-`;
-
-const ClassDataBoxDiv = styled.div`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  margin: 15px 0;
-`;
-
-const ClassDataBox = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  background-color: #2e3b55;
-  border-radius: 5px;
-  width: 20%;
-  color: white;
-`;
-
-const ClassDataBoxData = styled.p`
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: bold;
-`;
-
-const AttendanceTableText = styled.p`
-  margin: 0 12px;
-  font-size: 3rem;
+const Title = styled.p`
+  font-size: 2.5rem;
+  margin: 12px;
   font-weight: bold;
   color: #2e3b55;
 `;
