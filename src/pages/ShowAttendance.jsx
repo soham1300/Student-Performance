@@ -12,6 +12,9 @@ import {
 import { AuthContext } from "../context/AuthContext";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import * as XLSX from "xlsx";
+import Button from "@mui/material/Button";
+import DownloadIcon from "@mui/icons-material/Download";
 
 function ShowAttendance() {
   const { currentUser } = useContext(AuthContext);
@@ -100,9 +103,29 @@ function ShowAttendance() {
     };
   });
 
+  const downloadExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance Data");
+    XLSX.writeFile(workbook, "attendance_data.xlsx");
+  };
+
   return (
     <ShowAttendanceDiv>
-      <Title>Student Attendance</Title>
+      <TitleBarDiv>
+        <Title>Student Attendance</Title>
+        {/* <LogoutButton onClick={() => navigate("/")}> */}
+        <Button
+          variant="contained"
+          size="large"
+          onClick={downloadExcel}
+          style={{
+            margin: "0 1rem",
+          }}
+        >
+          Downlaod Excel <DownloadIcon />
+        </Button>
+      </TitleBarDiv>
       <hr />
       <div className="card">
         <DataTable
@@ -149,4 +172,11 @@ const Title = styled.p`
   margin: 12px;
   font-weight: bold;
   color: #2e3b55;
+`;
+
+const TitleBarDiv = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
 `;

@@ -4,7 +4,6 @@ import Button from "@mui/material/Button";
 import SendIcon from "@mui/icons-material/Send";
 import {
   doc,
-  getDoc,
   collection,
   query,
   where,

@@ -193,24 +193,27 @@ const Title = styled.p`
 `;
 
 const Table = styled.table`
-  border: 1px solid black;
-  border-collapse: collapse;
   font-size: 2rem;
   margin-left: 12px;
   width: 98%;
   color: #2e3b55;
+  text-align: left;
+  padding: 8px;
 `;
 
 const Th = styled.th`
-  border: 1px solid black;
-  border-collapse: collapse;
   padding: 8px;
+  text-align: center;
+  padding: 8px;
+  background-color: #2e3b55;
+  color: white;
 `;
 
 const Td = styled.td`
-  border: 1px solid black;
   border-collapse: collapse;
+  text-align: center;
   padding: 8px;
+  background-color: #e0e0e0;
 `;
 
 const BtnDiv = styled.div`

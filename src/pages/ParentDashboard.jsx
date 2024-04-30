@@ -12,11 +12,12 @@ import {
   query,
   where,
   getDocs,
+  updateDoc,
 } from "firebase/firestore";
 import { AuthContext } from "../context/AuthContext";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { useNavigate } from "react-router-dom";
-import AttendanceGraph from "../component/AttendanceGraph";
+import AttendanceGraph from "../component/ParentAttendanceGraph";
 import {
   Accordion,
   AccordionItem,
@@ -28,7 +29,7 @@ import "react-accessible-accordion/dist/fancy-example.css";
 import Button from "@mui/material/Button";
 import { signOut } from "firebase/auth";
 
-function TeacherDashboard({ toast }) {
+function ParentDashboard({ toast }) {
   const [classData, setClassData] = useState({});
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -42,9 +43,11 @@ function TeacherDashboard({ toast }) {
     Marathi: [],
   });
   const groupedExams = {};
+  const [studentUid, setStudentUid] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
+      let studentName = "";
       const q = query(
         collection(db, "users"),
         where("uid", "==", currentUser.uid)
@@ -52,6 +55,8 @@ function TeacherDashboard({ toast }) {
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach(async (document) => {
         console.log(document.id, " => ", document.data());
+
+        studentName = document.data().displayName;
         const classSnap = await getDoc(
           doc(db, "classes", document.data().classId)
         );
@@ -72,6 +77,11 @@ function TeacherDashboard({ toast }) {
             newAssignments[assignment.subject].push(assignment);
           });
           setAssignments(newAssignments);
+          classSnap.data().students.forEach((student) => {
+            if (student.name === studentName) {
+              setStudentUid(student.uid);
+            }
+          });
         } else {
           console.log("No such document!");
         }
@@ -98,15 +108,15 @@ function TeacherDashboard({ toast }) {
       {classData && (
         <>
           <TitleBarDiv>
-            <Title>Teacher Dashboard</Title>
+            <Title>Parents Dashboard</Title>
             {/* <LogoutButton onClick={() => navigate("/")}> */}
-            <div>
+            <BtnDiv>
               <Button
                 variant="contained"
                 color="success"
-                size="large"
+                size="small"
                 onClick={() => {
-                  navigate("/parent-connect");
+                  navigate("/parent-parent-connect");
                 }}
                 style={{
                   margin: "0 1rem",
@@ -117,7 +127,7 @@ function TeacherDashboard({ toast }) {
               <Button
                 variant="contained"
                 color="error"
-                size="large"
+                size="small"
                 onClick={() =>
                   signOut(auth)
                     .then(() => {
@@ -133,62 +143,23 @@ function TeacherDashboard({ toast }) {
               >
                 Logout
               </Button>
-            </div>
+            </BtnDiv>
           </TitleBarDiv>
           <hr />
-          <ClassDataBoxDiv>
-            <ClassDataBox>
-              <GiTeacher size={42} />
-              Class
-              <ClassDataBoxData>
-                {classData.className ? classData.className : "-"}
-              </ClassDataBoxData>
-            </ClassDataBox>
-            <ClassDataBox>
-              <PiStudent size={42} />
-              Total Students
-              <ClassDataBoxData>
-                {classData.students ? classData.students.length : "-"}
-              </ClassDataBoxData>
-            </ClassDataBox>
-            <ClassDataBox>
-              <PiChartScatter size={42} />
-              Avg. Attendance
-              <ClassDataBoxData>
-                {classData.attendance ? classData.attendance.length : "-"}
-              </ClassDataBoxData>
-            </ClassDataBox>
-            <ClassDataBox>
-              <MdOutlineAssignment size={42} />
-              Assignments
-              <ClassDataBoxData>
-                {classData.assignments ? classData.assignments.length : "-"}
-              </ClassDataBoxData>
-            </ClassDataBox>
-          </ClassDataBoxDiv>
+
           <AttendanceDiv>
             <AttendanceTop>
               <Title>Attendance</Title>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <TakeAtt onClick={() => navigate("/showattendance")}>
-                  Show Attendance
-                </TakeAtt>
-                <TakeAtt onClick={() => navigate("/attendance")}>
-                  Take Attendance <KeyboardArrowRightIcon fontSize="large" />
-                </TakeAtt>
-              </div>
             </AttendanceTop>
             <AttendanceGraph
               attendanceData={classData.attendance}
               totalStudents={classData.students ? classData.students.length : 0}
+              studentUid={studentUid}
             />
           </AttendanceDiv>
           <AssignmentDiv>
             <AssignmentTop>
               <Title>Assignment</Title>
-              <AddAss onClick={() => navigate("/addassignment")}>
-                Add Assignment <KeyboardArrowRightIcon fontSize="large" />
-              </AddAss>
             </AssignmentTop>
             <AssignmentDataDiv>
               {assignments &&
@@ -201,15 +172,33 @@ function TeacherDashboard({ toast }) {
                           assignmentsArray.map((assignment, index) => (
                             <AccordionItem key={index} style={{ width: "94%" }}>
                               <AccordionItemHeading>
-                                <AccordionItemButton>
-                                  {assignment.title}
-                                </AccordionItemButton>
+                                {assignment.submitted.includes(studentUid) ? (
+                                  <AccordionItemButton
+                                    style={{
+                                      width: "100%", // Ensure the button takes full width of the item
+                                      backgroundColor: "#bff3bf",
+                                      "@media (max-width: 768px)": {
+                                        width: "90%", // Reduce width on mobile devices
+                                      },
+                                    }}
+                                  >
+                                    {assignment.title}
+                                  </AccordionItemButton>
+                                ) : (
+                                  <AccordionItemButton
+                                    style={{
+                                      width: "100%", // Ensure the button takes full width of the item
+                                      backgroundColor: "#f0acac",
+                                      "@media (max-width: 768px)": {
+                                        width: "90%", // Reduce width on mobile devices
+                                      },
+                                    }}
+                                  >
+                                    {assignment.title}
+                                  </AccordionItemButton>
+                                )}
                               </AccordionItemHeading>
-                              <AccordionItemPanel
-                                onClick={() =>
-                                  navigate(`/assignment/${assignment.title}`)
-                                }
-                              >
+                              <AccordionItemPanel>
                                 <p>{assignment.assignment}</p>
                               </AccordionItemPanel>
                             </AccordionItem>
@@ -223,11 +212,6 @@ function TeacherDashboard({ toast }) {
           <MarksDiv>
             <AttendanceTop>
               <Title>Students Marks</Title>
-              <div>
-                <TakeAtt onClick={() => navigate("/addmarks")}>
-                  Add Marks <KeyboardArrowRightIcon fontSize="large" />
-                </TakeAtt>
-              </div>
             </AttendanceTop>
             <MarksDiv>
               {Object.keys(groupedExams)
@@ -237,12 +221,22 @@ function TeacherDashboard({ toast }) {
                     <ExamDate>{examDate}</ExamDate>
                     <MarksList>
                       {groupedExams[examDate].map((exam, index) => (
-                        <ExamItem
-                          key={index}
-                          onClick={() => navigate(`/exam/${exam.examName}`)}
-                        >
+                        <ExamItem key={index}>
                           <ExamDetails>Exam: {exam.examName}</ExamDetails>
                           <ExamDetails>Subject: {exam.subject}</ExamDetails>
+
+                          <ExamDetails key={index}>
+                            Total Marks:{exam.totalMarks}
+                          </ExamDetails>
+
+                          {exam.marksObtained &&
+                          exam.marksObtained[studentUid] ? (
+                            <ExamDetails>
+                              Marks Obtained: {exam.marksObtained[studentUid]}
+                            </ExamDetails>
+                          ) : (
+                            <ExamDetails>Marks Obtained: N/A</ExamDetails>
+                          )}
                         </ExamItem>
                       ))}
                     </MarksList>
@@ -256,7 +250,7 @@ function TeacherDashboard({ toast }) {
   );
 }
 
-export default TeacherDashboard;
+export default ParentDashboard;
 
 const TeacherDashboardDiv = styled.div``;
 
@@ -265,6 +259,9 @@ const Title = styled.p`
   margin: 12px;
   font-weight: bold;
   color: #2e3b55;
+  @media only screen and (max-width: 600px) {
+    font-size: 1.5rem;
+  }
 `;
 
 const ClassDataBoxDiv = styled.div`
@@ -326,6 +323,9 @@ const AssignmentDataDiv = styled.div`
   width: 100%;
   display: grid;
   grid-template-columns: auto auto auto;
+  @media only screen and (max-width: 600px) {
+    grid-template-columns: auto;
+  }
 `;
 
 const AssignmentData = styled.div`
@@ -335,6 +335,7 @@ const AssignmentData = styled.div`
   border-radius: 5px;
   text-align: center;
   border: 1px solid #2e3b55;
+  background-color: #f0f0f0;
 `;
 
 const AssignmentDataTitle = styled.div`
@@ -375,16 +376,20 @@ const ExamItem = styled.div`
 `;
 
 const ExamDate = styled.p`
-  font-size: 2rem;
+  font-size: 1.3rem;
   margin: 12px;
   font-weight: bold;
   color: #2e3b55;
 `;
 
 const ExamDetails = styled.p`
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   border-radius: 5px;
   padding: 8px;
   margin: 0;
   color: white;
+`;
+
+const BtnDiv = styled.div`
+  display: flex;
 `;

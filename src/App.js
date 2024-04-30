@@ -17,6 +17,12 @@ import TeacherDashboard from "./pages/TeacherDashboard";
 import Attendance from "./pages/Attendance";
 import AddAssignment from "./pages/AddAssignment";
 import ShowAttendance from "./pages/ShowAttendance";
+import Assignment from "./pages/Assignment";
+import AddMarks from "./pages/AddMarks";
+import ShowMarks from "./pages/ShowMarks";
+import Chatting from "./pages/Chatting";
+import ParentDashboard from "./pages/ParentDashboard";
+import ParentChatting from "./pages/ParentChatting";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
@@ -108,6 +114,59 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="addmarks"
+          element={
+            <ProtectedRoute>
+              <AddMarks toast={toast} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="parent-connect"
+          element={
+            <ProtectedRoute>
+              <Chatting toast={toast} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="parent-parent-connect"
+          element={
+            <ProtectedRoute>
+              <ParentChatting toast={toast} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="parent-dashboard"
+          element={
+            <ProtectedRoute>
+              <ParentDashboard toast={toast} />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="assignment">
+          <Route
+            path=":assignmentId"
+            element={
+              <ProtectedRoute>
+                <Assignment toast={toast} />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
+        <Route path="exam">
+          <Route
+            path=":examName"
+            element={
+              <ProtectedRoute>
+                <ShowMarks toast={toast} />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
       </Routes>
     </div>
   );

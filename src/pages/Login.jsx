@@ -5,8 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../DB/FirebaseConfig";
 import {
-  doc,
-  getDoc,
   collection,
   query,
   where,
@@ -20,9 +18,8 @@ function Login({ toast }) {
   const [isParantLogin, setIsParentLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [passwordConfirm, setPasswordConfirm] = useState("");
   const navigate = useNavigate();
-  const [parentRegister, setParentRegister] = useState(false);
+
   const switchLoginText = isParantLogin
     ? "Login as a School Administrator"
     : "Login as a Parent or Teacher";
@@ -46,7 +43,7 @@ function Login({ toast }) {
               if (doc.data().type === "teacher") {
                 navigate("/teacher");
               } else {
-                navigate("/student");
+                navigate("/parent-dashboard");
               }
             } else {
               navigate("/admin/classes");
@@ -134,43 +131,76 @@ function Login({ toast }) {
         //   const emailAvailable = await checkEmail();
         //   if (emailAvailable) {
         //     setParentRegister(true);
-        //     if (password === passwordConfirm) {
-        //       createUserWithEmailAndPassword(auth, email, password)
-        //         .then(async (userCredential) => {
-        //           const user = userCredential.user;
-        //           const q = query(
-        //             collection(db, "users"),
-        //             where("loginEmail", "==", email)
-        //           );
-        //           const querySnapshot = await getDocs(q);
-        //           querySnapshot.forEach(async (doc) => {
-        //             await updateDoc(doc.ref, {
-        //               uid: user.uid,
-        //             });
-        //             if (isParantLogin) {
-        //               if (doc.data().type === "teacher") {
-        //                 navigate("/teacher");
-        //               } else {
-        //                 navigate("/student");
-        //               }
-        //             } else {
-        //               navigate("/admin/classes");
-        //             }
+        //     createUserWithEmailAndPassword(auth, email, password)
+        //       .then(async (userCredential) => {
+        //         const user = userCredential.user;
+        //         const q = query(
+        //           collection(db, "users"),
+        //           where("loginEmail", "==", email)
+        //         );
+        //         const querySnapshot = await getDocs(q);
+        //         querySnapshot.forEach(async (doc) => {
+        //           await updateDoc(doc.ref, {
+        //             uid: user.uid,
         //           });
-        //         })
-        //         .catch((error) => {
-        //           const errorMessage = error.message;
-        //           console.log(errorMessage);
+        //           if (isParantLogin) {
+        //             if (doc.data().type === "teacher") {
+        //               navigate("/teacher");
+        //             } else {
+        //               navigate("/student");
+        //             }
+        //           } else {
+        //             navigate("/admin/classes");
+        //           }
         //         });
-        //     } else {
-        //       toast.error("Password doesn't match");
-        //     }
+        //       })
+        //       .catch((error) => {
+        //         const errorMessage = error.message;
+        //         console.log(errorMessage);
+        //       });
         //   }
         // } else {
         //   toast.error(error.code);
         // }
+
         toast.error(error.code);
       });
+  };
+
+  const Register = async () => {
+    const emailAvailable = await checkEmail();
+    console.log(emailAvailable);
+    if (emailAvailable) {
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(async (userCredential) => {
+          const user = userCredential.user;
+          const q = query(
+            collection(db, "users"),
+            where("loginEmail", "==", email)
+          );
+          const querySnapshot = await getDocs(q);
+          querySnapshot.forEach(async (doc) => {
+            await updateDoc(doc.ref, {
+              uid: user.uid,
+            });
+            if (isParantLogin) {
+              if (doc.data().type === "teacher") {
+                navigate("/teacher");
+              } else {
+                navigate("/parent-dashboard");
+              }
+            } else {
+              navigate("/admin/classes");
+            }
+          });
+        })
+        .catch((error) => {
+          const errorMessage = error.message;
+          console.log(errorMessage);
+        });
+    } else {
+      toast.error("Contact admin for registration");
+    }
   };
 
   const checkEmail = async () => {
@@ -185,9 +215,7 @@ function Login({ toast }) {
       <LoginDiv>
         <ParentLoginDiv isParantLogin={isParantLogin}>
           <LoginForm>
-            <Title>
-              Parent / Teacher {parentRegister ? "Register" : "Login"}
-            </Title>
+            <Title>Parent / Teacher Login</Title>
             <Emailinput
               onChange={(e) => {
                 setEmail(e.target.value);
@@ -200,23 +228,25 @@ function Login({ toast }) {
               }}
               required
             />
-            {parentRegister && (
-              <Passwordinput
-                onChange={(e) => {
-                  setPasswordConfirm(e.target.value);
-                }}
-                required
-              />
-            )}
-            <Button
-              variant="contained"
-              color="success"
-              size="large"
-              style={{ marginTop: "20px" }}
-              onClick={Login}
-            >
-              Login
-            </Button>
+            <BtnDiv>
+              <Button
+                variant="contained"
+                color="success"
+                size="large"
+                style={{ marginTop: "20px" }}
+                onClick={Login}
+              >
+                Login
+              </Button>
+              <Button
+                variant="contained"
+                size="large"
+                style={{ marginTop: "20px" }}
+                onClick={Register}
+              >
+                Register
+              </Button>
+            </BtnDiv>
           </LoginForm>
         </ParentLoginDiv>
         <ParentLoginDivOverlay isParantLogin={isParantLogin}>
@@ -410,4 +440,11 @@ const OverlayDescription = styled.p`
   font-size: 1rem;
   text-align: center;
   margin: 20px;
+`;
+
+const BtnDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 20px;
 `;

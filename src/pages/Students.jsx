@@ -6,7 +6,6 @@ import AddIcon from "@mui/icons-material/Add";
 import {
   doc,
   updateDoc,
-  setDoc,
   getDoc,
   serverTimestamp,
   arrayUnion,
@@ -15,8 +14,8 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { UserContext } from "../context/UserContex";
-import { db, auth } from "../DB/FirebaseConfig";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { db } from "../DB/FirebaseConfig";
+
 import { AuthContext } from "../context/AuthContext";
 
 function Students({ toast }) {
@@ -27,7 +26,7 @@ function Students({ toast }) {
   const [studentName, setStudentName] = useState();
   const [studentClass, setStudentClass] = useState();
   const [studentLoginEmail, setStudentLoginEmail] = useState();
-  const [studentLoginPassword, setStudentLoginPassword] = useState();
+
   const [student, setStudent] = useState([]);
 
   // const handleClick = async () => {

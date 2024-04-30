@@ -6,7 +6,6 @@ import AddIcon from "@mui/icons-material/Add";
 import {
   doc,
   updateDoc,
-  setDoc,
   getDoc,
   serverTimestamp,
   arrayUnion,
@@ -15,10 +14,9 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { UserContext } from "../context/UserContex";
-import { db, auth } from "../DB/FirebaseConfig";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { db } from "../DB/FirebaseConfig";
+
 import { AuthContext } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 
 function Teachers({ toast }) {
   const [addTeacher, setAddTeacher] = useState(false);
@@ -26,10 +24,10 @@ function Teachers({ toast }) {
   const [teacherName, setTeacherName] = useState();
   const [teacherClass, setTeacherClass] = useState();
   const [teacherLoginEmail, setTeacherLoginEmail] = useState();
-  const [teacherLoginPassword, setTeacherLoginPassword] = useState();
+
   const { userData } = useContext(UserContext);
   const { currentUser } = useContext(AuthContext);
-  const navigate = useNavigate();
+
   const [teachers, setTeachers] = useState([]);
 
   const handleClick = async () => {
