@@ -78,7 +78,7 @@ function ShowAttendance() {
       // Create a new row with the student id as the unique id
       const newRow = {
         id: row.id, // Use the student id as the unique id
-        rollNo: index,
+        rollNo: index + 1,
         studentName: row.name,
         ...uniqueDates.reduce((acc, date) => {
           acc[date] = ""; // Initialize attendance for each date

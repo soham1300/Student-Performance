@@ -24,38 +24,38 @@ function ParentChatting() {
   const [message, setMessage] = useState("");
   const [studentUid, setStudentUid] = useState("");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      let studentName = "";
-      const q = query(
-        collection(db, "users"),
-        where("uid", "==", currentUser.uid)
-      );
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach(async (document) => {
-        console.log(document.id, " => ", document.data());
-        setClassId(document.data().classId);
-        studentName = document.data().displayName;
-        const classSnap = await getDoc(
-          doc(db, "classes", document.data().classId)
-        );
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     let studentName = "";
+  //     const q = query(
+  //       collection(db, "users"),
+  //       where("uid", "==", currentUser.uid)
+  //     );
+  //     const querySnapshot = await getDocs(q);
+  //     querySnapshot.forEach(async (document) => {
+  //       console.log(document.id, " => ", document.data());
+  //       setClassId(document.data().classId);
+  //       studentName = document.data().displayName;
+  //       const classSnap = await getDoc(
+  //         doc(db, "classes", document.data().classId)
+  //       );
 
-        if (classSnap.exists()) {
-          console.log("Document data:", classSnap.data());
-          if (classSnap.data().students.length > 0) {
-            classSnap.data().students.forEach((student) => {
-              if (student.name === studentName) {
-                setStudentUid(student.uid);
-              }
-            });
-          }
-        } else {
-          console.log("No such document!");
-        }
-      });
-    };
-    fetchData();
-  }, [currentUser.uid]);
+  //       if (classSnap.exists()) {
+  //         console.log("Document data:", classSnap.data());
+  //         if (classSnap.data().students.length > 0) {
+  //           classSnap.data().students.forEach((student) => {
+  //             if (student.name === studentName) {
+  //               setStudentUid(student.uid);
+  //             }
+  //           });
+  //         }
+  //       } else {
+  //         console.log("No such document!");
+  //       }
+  //     });
+  //   };
+  //   fetchData();
+  // }, [currentUser.uid]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -96,6 +96,34 @@ function ParentChatting() {
     };
     fetchData();
   }, [classId, studentUid, currentUser.uid]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (classId && studentUid) {
+        const chatId = classId + studentUid;
+        const chatRef = doc(db, "chats", chatId);
+
+        // Listen for changes to the chat document
+        const unsubscribe = onSnapshot(chatRef, (doc) => {
+          if (doc.exists()) {
+            const chatData = doc.data();
+            const messages = chatData.messages || []; // Use messages or empty array if not present
+            setMessages(messages);
+          } else {
+            // Document doesn't exist, set messages to empty array
+            setMessages([]);
+          }
+        });
+
+        // Cleanup the listener when component unmounts or when chatId changes
+        return () => {
+          unsubscribe();
+        };
+      }
+    };
+
+    fetchData();
+  }, [classId, studentUid]);
 
   const sendMessage = async () => {
     if (message.trim() === "") return;
