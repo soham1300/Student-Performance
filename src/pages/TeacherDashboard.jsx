@@ -68,10 +68,12 @@ function TeacherDashboard({ toast }) {
             Hindi: [],
             Marathi: [],
           };
-          classSnap.data().assignments.forEach((assignment) => {
-            newAssignments[assignment.subject].push(assignment);
-          });
-          setAssignments(newAssignments);
+          if (classSnap.data().assignments) {
+            classSnap.data().assignments.forEach((assignment) => {
+              newAssignments[assignment.subject].push(assignment);
+            });
+            setAssignments(newAssignments);
+          }
         } else {
           console.log("No such document!");
         }
@@ -82,7 +84,7 @@ function TeacherDashboard({ toast }) {
 
   // Define groupedExams object
 
-  if (classData.marks) {
+  if (classData && classData.marks) {
     classData.marks.forEach((exam) => {
       if (!groupedExams[exam.examDate]) {
         groupedExams[exam.examDate] = [];
@@ -178,10 +180,16 @@ function TeacherDashboard({ toast }) {
                 </TakeAtt>
               </div>
             </AttendanceTop>
-            <AttendanceGraph
-              attendanceData={classData.attendance}
-              totalStudents={classData.students ? classData.students.length : 0}
-            />
+            {classData.attendance ? (
+              <AttendanceGraph
+                attendanceData={classData.attendance}
+                totalStudents={
+                  classData.students ? classData.students.length : 0
+                }
+              />
+            ) : (
+              <NoAttendDiv>No Attendance</NoAttendDiv>
+            )}
           </AttendanceDiv>
           <AssignmentDiv>
             <AssignmentTop>
@@ -387,4 +395,18 @@ const ExamDetails = styled.p`
   padding: 8px;
   margin: 0;
   color: white;
+`;
+
+const NoAttendDiv = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin: 15px 0;
+  color: #2e3b55;
+  font-size: 1.5rem;
+  font-weight: bold;
+  background-color: white;
+  border-radius: 5px;
 `;

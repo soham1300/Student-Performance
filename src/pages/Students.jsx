@@ -17,6 +17,7 @@ import { UserContext } from "../context/UserContex";
 import { db } from "../DB/FirebaseConfig";
 
 import { AuthContext } from "../context/AuthContext";
+import MenuItem from "@mui/material/MenuItem";
 
 function Students({ toast }) {
   const [addStudent, setAddStudent] = useState(false);
@@ -28,6 +29,7 @@ function Students({ toast }) {
   const [studentLoginEmail, setStudentLoginEmail] = useState();
 
   const [student, setStudent] = useState([]);
+  const [schoolData, setSchoolData] = useState({});
 
   // const handleClick = async () => {
   //   const classPresent = userData.classes.some(
@@ -121,31 +123,46 @@ function Students({ toast }) {
         if (currentUser.uid) {
           const schoolData = await getDoc(doc(db, "school", currentUser.uid));
           console.log(schoolData.data());
+          setSchoolData(schoolData.data());
 
           if (schoolData.exists()) {
-            const newStudentssArray = await Promise.all(
-              schoolData.data().students.map(async (student) => {
-                const docData = await getDoc(doc(db, "users", student.uid));
-                return docData.data();
-              })
-            );
+            setSchoolData(schoolData.data()); // Set schoolData
+            if (schoolData.data().classes) {
+              const newStudentssArray = await Promise.all(
+                schoolData.data().students.map(async (student) => {
+                  const docData = await getDoc(doc(db, "users", student.uid));
+                  return docData.data();
+                })
+              );
 
-            setStudent(newStudentssArray); // Update the state directly
-            setClassesAvailable(true);
+              setStudent(newStudentssArray); // Update the state directly
+              setClassesAvailable(true);
+            } else {
+              setClassesAvailable(false);
+            }
 
             const unsub = onSnapshot(
               doc(db, "school", currentUser.uid),
               async (schoolDoc) => {
-                const newStudentssArray = await Promise.all(
-                  schoolDoc.data().students.map(async (students) => {
-                    const docData = await getDoc(
-                      doc(db, "users", students.uid)
+                if (schoolDoc.exists()) {
+                  setSchoolData(schoolDoc.data()); // Update schoolData
+                  if (schoolDoc.data().classes) {
+                    const newStudentssArray = await Promise.all(
+                      schoolDoc.data().students.map(async (students) => {
+                        const docData = await getDoc(
+                          doc(db, "users", students.uid)
+                        );
+                        return docData.data();
+                      })
                     );
-                    return docData.data();
-                  })
-                );
-                setStudent(newStudentssArray);
-                setClassesAvailable(true);
+                    setStudent(newStudentssArray);
+                    setClassesAvailable(true);
+                  } else {
+                    setClassesAvailable(false);
+                  }
+                } else {
+                  setClassesAvailable(false);
+                }
               }
             );
 
@@ -187,8 +204,19 @@ function Students({ toast }) {
               id="outlined-basic"
               label="Student Class"
               variant="outlined"
+              select
+              value={studentClass}
               onChange={(e) => setStudentClass(e.target.value)}
-            />
+              style={{ width: "200px" }}
+            >
+              {schoolData.classes &&
+                schoolData.classes.map((cls) => (
+                  <MenuItem key={cls.id} value={cls.className}>
+                    {cls.className}
+                  </MenuItem>
+                ))}
+            </TextField>
+
             <TextField
               id="outlined-basic"
               label="Student Login Email"
@@ -260,7 +288,7 @@ const AddStudentBtn = styled.div`
   cursor: pointer;
   padding: 8px;
   display: ${(props) => (props.addStudent ? "none" : "flex")};
-  width: 12%;
+  width: 20%;
   align-items: center;
   justify-content: center;
   &:hover {

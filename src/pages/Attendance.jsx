@@ -68,19 +68,21 @@ function Attendance() {
         where("uid", "==", currentUser.uid)
       );
       const querySnapshot = await getDocs(q);
-      querySnapshot.forEach(async (document) => {
-        console.log(document.id, " => ", document.data());
-        setClassId(document.data().classId);
-        const classSnap = await getDoc(
-          doc(db, "classes", document.data().classId)
-        );
-        if (classSnap.exists()) {
-          console.log("Document data:", classSnap.data());
-          setClassData(classSnap.data());
-        } else {
-          console.log("No such document!");
-        }
-      });
+      if (querySnapshot) {
+        querySnapshot.forEach(async (document) => {
+          console.log(document.id, " => ", document.data());
+          setClassId(document.data().classId);
+          const classSnap = await getDoc(
+            doc(db, "classes", document.data().classId)
+          );
+          if (classSnap.exists()) {
+            console.log("Document data:", classSnap.data());
+            setClassData(classSnap.data());
+          } else {
+            console.log("No such document!");
+          }
+        });
+      }
     };
     fetchData();
   }, [currentUser.uid]);

@@ -338,12 +338,18 @@ const ParentLoginDiv = styled.div`
   display: ${(props) => !props.isParantLogin && "none"};
   height: 100%;
   width: 50%;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const TeacherLoginDiv = styled.div`
   display: ${(props) => props.isParantLogin && "none"};
   height: 100%;
   width: 50%;
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const LoginForm = styled.form`
@@ -357,6 +363,7 @@ const LoginForm = styled.form`
 
 const Title = styled.p`
   font-size: 2rem;
+  text-align: center;
 `;
 
 const Emailinput = styled.input.attrs({
@@ -377,6 +384,7 @@ const Emailinput = styled.input.attrs({
   }
   @media (max-width: 768px) {
     margin-top: 10px;
+    width: 90%;
   }
 `;
 
@@ -395,9 +403,10 @@ const Passwordinput = styled.input.attrs({
     outline: none;
     border-color: #cccccc;
     box-shadow: 0 0 0 2px #7c7c7c;
-    @media (max-width: 768px) {
-      margin-top: 10px;
-    }
+  }
+  @media (max-width: 768px) {
+    margin-top: 10px;
+    width: 90%;
   }
 `;
 
@@ -429,6 +438,9 @@ const TeacherLoginDivOverlay = styled.div`
   opacity: ${(props) => (props.isParantLogin ? 1 : 0)};
   transform: translateX(${(props) => (props.isParantLogin ? "0" : "-100%")});
   transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const OverlayTitle = styled.p`

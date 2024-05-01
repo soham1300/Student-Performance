@@ -250,7 +250,7 @@ const SendMessageInput = styled.input`
   border: none;
   border-radius: 5px;
   font-size: 1.5rem;
-  height: 50%;
+  height: 100%;
   background-color: #eeeeee;
 `;
 

@@ -11,6 +11,30 @@ import attendImg from "../images/attendance.png";
 import HomeImg from "../images/Home.svg";
 
 function Home() {
+  const isMobile = useDeviceType();
+
+  function useDeviceType() {
+    const [isMobile, setIsMobile] = React.useState(false);
+
+    React.useEffect(() => {
+      const handleResize = () => {
+        setIsMobile(window.innerWidth <= 768); // Adjust the width threshold as needed
+      };
+
+      // Initial check on mount
+      handleResize();
+
+      // Listen for window resize events
+      window.addEventListener("resize", handleResize);
+
+      // Clean up event listener on unmount
+      return () => {
+        window.removeEventListener("resize", handleResize);
+      };
+    }, []);
+
+    return isMobile;
+  }
   return (
     <HomeDiv>
       <Navbar />
@@ -22,12 +46,17 @@ function Home() {
             tracking.
           </MainTextSubTitle>
         </MainText>
-        <img alt="" src={HomeImg} />
+        <ImgDiv>
+          <img alt="" src={HomeImg} />
+        </ImgDiv>
       </MainDiv>
       <About id="about">
         <AboutTitle>About Student Performance Tracking Tool</AboutTitle>
         <AboutInfo>
-          <AboutImg src={aboutImg} alt="" srcset="" />
+          <ImgDiv>
+            <AboutImg src={aboutImg} alt="" srcset="" />
+          </ImgDiv>
+
           <AboutText>
             Welcome to our Student Performance Tracking Tool – a comprehensive
             solution designed to empower educators, parents, and students by
@@ -63,6 +92,11 @@ function Home() {
         </FeaturesInfo>
         {/* Student Results */}
         <FeaturesInfo>
+          {isMobile && (
+            <FeaturesImgDiv>
+              <FeaturesImg src={resultImg} alt="" srcset="" />
+            </FeaturesImgDiv>
+          )}
           <FeaturesText>
             <FeaturesTextTitle>Student Results</FeaturesTextTitle>
             <CheckIcon color="success" /> Track performance in all exams: Marks,
@@ -76,9 +110,11 @@ function Home() {
             <CheckIcon color="success" /> Get actionable insights to improve
             student performance.
           </FeaturesText>
-          <FeaturesImgDiv>
-            <FeaturesImg src={resultImg} alt="" srcset="" />
-          </FeaturesImgDiv>
+          {!isMobile && (
+            <FeaturesImgDiv>
+              <FeaturesImg src={resultImg} alt="" srcset="" />
+            </FeaturesImgDiv>
+          )}
         </FeaturesInfo>
         {/* Student Progress Graph */}
         <FeaturesInfo>
@@ -97,14 +133,21 @@ function Home() {
         </FeaturesInfo>
         {/* Exam Comment */}
         <FeaturesInfo>
+          {isMobile && (
+            <FeaturesImgDiv>
+              <FeaturesImg src={examImg} alt="" srcset="" />
+            </FeaturesImgDiv>
+          )}
           <FeaturesText>
             <FeaturesTextTitle>Exam Comment</FeaturesTextTitle>
             <CheckIcon color="success" /> Track Student Performance & teacher
             feedback for every exam in one central place.
           </FeaturesText>
-          <FeaturesImgDiv>
-            <FeaturesImg src={examImg} alt="" srcset="" />
-          </FeaturesImgDiv>
+          {!isMobile && (
+            <FeaturesImgDiv>
+              <FeaturesImg src={examImg} alt="" srcset="" />
+            </FeaturesImgDiv>
+          )}
         </FeaturesInfo>
         {/* Attendance */}
         <FeaturesInfo>
@@ -122,6 +165,7 @@ function Home() {
           </FeaturesText>
         </FeaturesInfo>
       </Features>
+      <Footer>&copy; 2024 Your Company Name. All Rights Reserved.</Footer>
     </HomeDiv>
   );
 }
@@ -141,15 +185,26 @@ const MainText = styled.div`
   justify-content: center;
   height: 100vh;
   flex-direction: column;
+  @media (max-width: 768px) {
+    z-index: 1;
+  }
 `;
 
 const MainTextTitle = styled.p`
   font-size: 5rem;
   margin: 0 10%;
+  @media (max-width: 768px) {
+    font-size: 3rem;
+    text-align: center;
+  }
 `;
 
 const MainTextSubTitle = styled.p`
   font-size: 1.5rem;
+  @media (max-width: 768px) {
+    font-size: 1rem;
+    text-align: center;
+  }
 `;
 
 const About = styled.div`
@@ -160,11 +215,19 @@ const About = styled.div`
 const AboutTitle = styled.p`
   font-size: 2.5rem;
   font-weight: bold;
+  @media (max-width: 768px) {
+    font-size: 1.8rem;
+    text-align: center;
+  }
 `;
 
 const AboutText = styled.p`
   font-size: 1.5rem;
   text-align: left;
+  @media (max-width: 768px) {
+    font-size: 1rem;
+    text-align: center;
+  }
 `;
 
 const AboutImg = styled.img`
@@ -180,6 +243,9 @@ const AboutInfo = styled.div`
 
 const Features = styled.div`
   padding-top: 25px;
+  @media (max-width: 768px) {
+    text-align: center;
+  }
 `;
 
 const FeaturesTitle = styled.p`
@@ -193,6 +259,10 @@ const FeaturesInfo = styled.div`
   align-items: center;
   margin-left: 20px;
   gap: 20px;
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+  }
 `;
 
 const FeaturesText = styled.div`
@@ -200,11 +270,20 @@ const FeaturesText = styled.div`
   text-align: left;
   align-items: center;
   width: 40vw;
+  @media (max-width: 768px) {
+    font-size: 1rem;
+    text-align: center;
+    width: 100%;
+  }
 `;
 
 const FeaturesTextTitle = styled.div`
   font-size: 2rem;
   font-weight: bold;
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+    text-align: center;
+  }
 `;
 const FeaturesImg = styled.img`
   width: 35vw;
@@ -212,10 +291,57 @@ const FeaturesImg = styled.img`
 
 const FeaturesImgDiv = styled.div`
   width: 40vw;
+  /* @media (max-width: 768px) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.3;
+    img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: cover;
+    }
+  } */
 `;
 
 const MainDiv = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  @media (max-width: 768px) {
+  }
+`;
+
+const ImgDiv = styled.div`
+  @media (max-width: 768px) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.3;
+    img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: cover;
+    }
+  }
+`;
+
+const Footer = styled.footer`
+  background-color: #2e3b55;
+  color: white;
+  text-align: center;
+  padding: 20px 0;
+  width: 100%;
 `;

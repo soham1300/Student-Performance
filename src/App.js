@@ -23,6 +23,7 @@ import ShowMarks from "./pages/ShowMarks";
 import Chatting from "./pages/Chatting";
 import ParentDashboard from "./pages/ParentDashboard";
 import ParentChatting from "./pages/ParentChatting";
+import UploadAssignment from "./pages/UploadAssignment";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
@@ -135,6 +136,14 @@ function App() {
           element={
             <ProtectedRoute>
               <ParentChatting toast={toast} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="upload-assignment"
+          element={
+            <ProtectedRoute>
+              <UploadAssignment toast={toast} />
             </ProtectedRoute>
           }
         />

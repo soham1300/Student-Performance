@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import styled from "styled-components";
-import { GiTeacher } from "react-icons/gi";
-import { PiStudent } from "react-icons/pi";
-import { PiChartScatter } from "react-icons/pi";
-import { MdOutlineAssignment } from "react-icons/md";
+
 import { db, auth } from "../DB/FirebaseConfig";
 import {
   doc,
@@ -12,7 +9,6 @@ import {
   query,
   where,
   getDocs,
-  updateDoc,
 } from "firebase/firestore";
 import { AuthContext } from "../context/AuthContext";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
@@ -73,10 +69,15 @@ function ParentDashboard({ toast }) {
             Hindi: [],
             Marathi: [],
           };
-          classSnap.data().assignments.forEach((assignment) => {
-            newAssignments[assignment.subject].push(assignment);
-          });
+
+          if (classSnap.data().assignments) {
+            classSnap.data().assignments.forEach((assignment) => {
+              newAssignments[assignment.subject].push(assignment);
+            });
+          }
+
           setAssignments(newAssignments);
+
           classSnap.data().students.forEach((student) => {
             if (student.name === studentName) {
               setStudentUid(student.uid);
@@ -151,15 +152,25 @@ function ParentDashboard({ toast }) {
             <AttendanceTop>
               <Title>Attendance</Title>
             </AttendanceTop>
-            <AttendanceGraph
-              attendanceData={classData.attendance}
-              totalStudents={classData.students ? classData.students.length : 0}
-              studentUid={studentUid}
-            />
+
+            {classData.attendance ? (
+              <AttendanceGraph
+                attendanceData={classData.attendance}
+                totalStudents={
+                  classData.students ? classData.students.length : 0
+                }
+                studentUid={studentUid}
+              />
+            ) : (
+              <NoAttendDiv>No Attendance</NoAttendDiv>
+            )}
           </AttendanceDiv>
           <AssignmentDiv>
             <AssignmentTop>
               <Title>Assignment</Title>
+              <AddAss onClick={() => navigate("/upload-assignment")}>
+                Upload Assignment <KeyboardArrowRightIcon fontSize="large" />
+              </AddAss>
             </AssignmentTop>
             <AssignmentDataDiv>
               {assignments &&
@@ -221,14 +232,12 @@ function ParentDashboard({ toast }) {
                     <ExamDate>{examDate}</ExamDate>
                     <MarksList>
                       {groupedExams[examDate].map((exam, index) => (
-                        <ExamItem key={index}>
-                          <ExamDetails>Exam: {exam.examName}</ExamDetails>
+                        <ExamItemContainer key={index}>
+                          <ExamName>{exam.examName}</ExamName>
                           <ExamDetails>Subject: {exam.subject}</ExamDetails>
-
-                          <ExamDetails key={index}>
-                            Total Marks:{exam.totalMarks}
+                          <ExamDetails>
+                            Total Marks: {exam.totalMarks}
                           </ExamDetails>
-
                           {exam.marksObtained &&
                           exam.marksObtained[studentUid] ? (
                             <ExamDetails>
@@ -237,7 +246,7 @@ function ParentDashboard({ toast }) {
                           ) : (
                             <ExamDetails>Marks Obtained: N/A</ExamDetails>
                           )}
-                        </ExamItem>
+                        </ExamItemContainer>
                       ))}
                     </MarksList>
                   </MarksDate>
@@ -264,30 +273,30 @@ const Title = styled.p`
   }
 `;
 
-const ClassDataBoxDiv = styled.div`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  margin: 15px 0;
-`;
+// const ClassDataBoxDiv = styled.div`
+//   width: 100%;
+//   display: flex;
+//   align-items: center;
+//   justify-content: space-around;
+//   margin: 15px 0;
+// `;
 
-const ClassDataBox = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  background-color: #2e3b55;
-  border-radius: 5px;
-  width: 20%;
-  color: white;
-`;
+// const ClassDataBox = styled.div`
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   flex-direction: column;
+//   background-color: #2e3b55;
+//   border-radius: 5px;
+//   width: 20%;
+//   color: white;
+// `;
 
-const ClassDataBoxData = styled.p`
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: bold;
-`;
+// const ClassDataBoxData = styled.p`
+//   margin: 0;
+//   font-size: 1.5rem;
+//   font-weight: bold;
+// `;
 
 const AttendanceDiv = styled.div``;
 
@@ -365,6 +374,7 @@ const MarksDate = styled.div`
 const MarksList = styled.div`
   display: flex;
   flex-wrap: wrap;
+  gap: 20px;
 `;
 
 const ExamItem = styled.div`
@@ -375,6 +385,24 @@ const ExamItem = styled.div`
   cursor: pointer;
 `;
 
+const ExamItemContainer = styled.div`
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  margin: 0 0 10px 10px;
+  background-color: #2e3b55;
+  color: white;
+`;
+
+const ExamName = styled.div`
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+`;
+
+const ExamDetails = styled.div`
+  margin-bottom: 5px;
+`;
 const ExamDate = styled.p`
   font-size: 1.3rem;
   margin: 12px;
@@ -382,14 +410,28 @@ const ExamDate = styled.p`
   color: #2e3b55;
 `;
 
-const ExamDetails = styled.p`
-  font-size: 1.1rem;
-  border-radius: 5px;
-  padding: 8px;
-  margin: 0;
-  color: white;
-`;
+// const ExamDetails = styled.p`
+//   font-size: 1.1rem;
+//   border-radius: 5px;
+//   padding: 8px;
+//   margin: 0;
+//   color: white;
+// `;
 
 const BtnDiv = styled.div`
   display: flex;
+`;
+
+const NoAttendDiv = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin: 15px 0;
+  color: #2e3b55;
+  font-size: 1.5rem;
+  font-weight: bold;
+  background-color: white;
+  border-radius: 5px;
 `;

@@ -15,12 +15,36 @@ import AdbIcon from "@mui/icons-material/Adb";
 import Stack from "@mui/material/Stack";
 import TimelineIcon from "@mui/icons-material/Timeline";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
 
 const pages = ["About", "Features", "Contact Us"];
 
 function Navbar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
+  const isMobile = useDeviceType();
 
+  function useDeviceType() {
+    const [isMobile, setIsMobile] = React.useState(false);
+
+    React.useEffect(() => {
+      const handleResize = () => {
+        setIsMobile(window.innerWidth <= 768); // Adjust the width threshold as needed
+      };
+
+      // Initial check on mount
+      handleResize();
+
+      // Listen for window resize events
+      window.addEventListener("resize", handleResize);
+
+      // Clean up event listener on unmount
+      return () => {
+        window.removeEventListener("resize", handleResize);
+      };
+    }, []);
+
+    return isMobile;
+  }
   const navigate = useNavigate();
 
   const handleOpenNavMenu = (event) => {
@@ -63,46 +87,48 @@ function Navbar() {
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "left",
-              }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
-              sx={{
-                display: { xs: "block", md: "none" },
-              }}
-            >
-              {pages.map((page) => (
-                <MenuItem
-                  key={page}
-                  onClick={() => scrollToSection(page.toLowerCase())}
-                  href={`#${page.toLowerCase()}`}
-                >
-                  <Typography textAlign="center">{page}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
+            <NavContentDiv>
+              <IconButton
+                size="large"
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleOpenNavMenu}
+                color="inherit"
+              >
+                <MenuIcon />
+              </IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorElNav}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "left",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "left",
+                }}
+                open={Boolean(anchorElNav)}
+                onClose={handleCloseNavMenu}
+                sx={{
+                  display: { xs: "block", md: "none" },
+                }}
+              >
+                {pages.map((page) => (
+                  <MenuItem
+                    key={page}
+                    onClick={() => scrollToSection(page.toLowerCase())}
+                    href={`#${page.toLowerCase()}`}
+                  >
+                    <Typography textAlign="center">{page}</Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </NavContentDiv>
           </Box>
-          <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
+          {/* <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} /> */}
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map((page) => (
               <Button
@@ -148,7 +174,7 @@ function Navbar() {
               <Button
                 variant="outlined"
                 color="primary"
-                size="large"
+                size={isMobile ? "small" : "medium"}
                 onClick={() => navigate("/login")}
               >
                 Login
@@ -156,7 +182,7 @@ function Navbar() {
               <Button
                 variant="contained"
                 color="primary"
-                size="large"
+                size={isMobile ? "small" : "medium"}
                 onClick={() => navigate("/register")}
               >
                 Get Started for Free
@@ -169,3 +195,9 @@ function Navbar() {
   );
 }
 export default Navbar;
+
+const NavContentDiv = styled.div`
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;

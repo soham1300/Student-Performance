@@ -17,6 +17,7 @@ import { UserContext } from "../context/UserContex";
 import { db } from "../DB/FirebaseConfig";
 
 import { AuthContext } from "../context/AuthContext";
+import MenuItem from "@mui/material/MenuItem";
 
 function Teachers({ toast }) {
   const [addTeacher, setAddTeacher] = useState(false);
@@ -29,6 +30,8 @@ function Teachers({ toast }) {
   const { currentUser } = useContext(AuthContext);
 
   const [teachers, setTeachers] = useState([]);
+
+  const [schoolData, setSchoolData] = useState({});
 
   const handleClick = async () => {
     const classPresent = userData.classes.some(
@@ -121,6 +124,7 @@ function Teachers({ toast }) {
         if (currentUser.uid) {
           const schoolData = await getDoc(doc(db, "school", currentUser.uid));
           console.log(schoolData.data());
+          setSchoolData(schoolData.data());
 
           if (schoolData.exists()) {
             const newTeachersArray = await Promise.all(
@@ -162,6 +166,10 @@ function Teachers({ toast }) {
     fetchData();
   }, [currentUser.uid]);
 
+  const handleClassChange = (e) => {
+    setTeacherClass(e.target.value);
+  };
+
   return (
     <TeachersDiv>
       <AddTeacherBtn
@@ -181,24 +189,30 @@ function Teachers({ toast }) {
               variant="outlined"
               onChange={(e) => setTeacherName(e.target.value)}
             />
+
             <TextField
               id="outlined-basic"
               label="Teacher Class"
               variant="outlined"
-              onChange={(e) => setTeacherClass(e.target.value)}
-            />
+              select
+              value={teacherClass}
+              onChange={handleClassChange}
+              style={{ width: "200px" }}
+            >
+              {schoolData.classes &&
+                schoolData.classes.map((cls) => (
+                  <MenuItem key={cls.id} value={cls.className}>
+                    {cls.className}
+                  </MenuItem>
+                ))}
+            </TextField>
+
             <TextField
               id="outlined-basic"
               label="Teacher Login Email"
               variant="outlined"
               onChange={(e) => setTeacherLoginEmail(e.target.value)}
             />
-            {/* <TextField
-              id="outlined-basic"
-              label="Teacher Login Password"
-              variant="outlined"
-              onChange={(e) => setTeacherLoginPassword(e.target.value)}
-            /> */}
           </InputDiv>
           <ButtonDiv>
             <Button variant="contained" color="success" onClick={handleClick}>
@@ -256,7 +270,7 @@ const AddTeacherBtn = styled.div`
   cursor: pointer;
   padding: 8px;
   display: ${(props) => (props.addTeacher ? "none" : "flex")};
-  width: 12%;
+  width: 20%;
   align-items: center;
   justify-content: center;
   &:hover {

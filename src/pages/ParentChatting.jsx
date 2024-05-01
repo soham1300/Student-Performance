@@ -18,7 +18,6 @@ import UserProfile from "../images/UserProfile.png";
 import SendIcon from "@mui/icons-material/Send";
 
 function ParentChatting() {
-  const [classData, setClassData] = useState(null);
   const { currentUser } = useContext(AuthContext);
   const [classId, setClassId] = useState();
   const [messages, setMessages] = useState([]);
@@ -43,12 +42,13 @@ function ParentChatting() {
 
         if (classSnap.exists()) {
           console.log("Document data:", classSnap.data());
-          setClassData(classSnap.data());
-          classSnap.data().students.forEach((student) => {
-            if (student.name === studentName) {
-              setStudentUid(student.uid);
-            }
-          });
+          if (classSnap.data().students.length > 0) {
+            classSnap.data().students.forEach((student) => {
+              if (student.name === studentName) {
+                setStudentUid(student.uid);
+              }
+            });
+          }
         } else {
           console.log("No such document!");
         }
@@ -59,31 +59,43 @@ function ParentChatting() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (studentUid && classId) {
-        const chatId = classId + studentUid;
-        const chatRef = doc(db, "chats", chatId);
+      let studentName = "";
+      const q = query(
+        collection(db, "users"),
+        where("uid", "==", currentUser.uid)
+      );
+      const querySnapshot = await getDocs(q);
 
-        // Listen for changes to the chat document
-        const unsubscribe = onSnapshot(chatRef, (doc) => {
-          if (doc.exists()) {
-            const chatData = doc.data();
-            const messages = chatData.messages || []; // Use messages or empty array if not present
-            setMessages(messages);
+      if (!querySnapshot.empty) {
+        // Check if querySnapshot is not empty
+        querySnapshot.forEach(async (document) => {
+          console.log(document.id, " => ", document.data());
+          setClassId(document.data().classId);
+          studentName = document.data().displayName;
+          const classSnap = await getDoc(
+            doc(db, "classes", document.data().classId)
+          );
+
+          if (classSnap.exists()) {
+            console.log("Document data:", classSnap.data());
+            const students = classSnap.data().students;
+            if (students && students.length > 0) {
+              students.forEach((student) => {
+                if (student.name === studentName) {
+                  setStudentUid(student.uid);
+                }
+              });
+            }
           } else {
-            // Document doesn't exist, set messages to empty array
-            setMessages([]);
+            console.log("No such document!");
           }
         });
-
-        // Cleanup the listener when component unmounts or when chatId changes
-        return () => {
-          unsubscribe();
-        };
+      } else {
+        console.log("No documents found for the query!");
       }
     };
-
     fetchData();
-  }, [classId, studentUid]);
+  }, [classId, studentUid, currentUser.uid]);
 
   const sendMessage = async () => {
     if (message.trim() === "") return;
@@ -136,27 +148,29 @@ function ParentChatting() {
       <MainDiv>
         <RightDiv>
           <ChatDiv>
-            {messages.map((message, index) => (
-              <MessageDiv
-                key={index}
-                alignRight={message.sender === currentUser.uid}
-                read={message.read}
-              >
-                <div className="user-pic">
-                  <img src={UserProfile} alt="" srcset="" />
-                </div>
-                <div className="message-content">
-                  <div className="user-name">
-                    {message.sender === currentUser.uid ? "You" : "Teacher"}
+            {messages &&
+              messages.map((message, index) => (
+                <MessageDiv
+                  key={index}
+                  alignRight={message.sender === currentUser.uid}
+                  read={message.read}
+                >
+                  <div className="user-pic">
+                    <img src={UserProfile} alt="" srcset="" />
                   </div>
-                  <div className="message-text">{message.message}</div>
-                  <div className="message-time">
-                    {formatMessageTime(message.time)}
+                  <div className="message-content">
+                    <div className="user-name">
+                      {message.sender === currentUser.uid ? "You" : "Teacher"}
+                    </div>
+                    <div className="message-text">{message.message}</div>
+                    <div className="message-time">
+                      {formatMessageTime(message.time)}
+                    </div>
                   </div>
-                </div>
-              </MessageDiv>
-            ))}
+                </MessageDiv>
+              ))}
           </ChatDiv>
+
           <SendChatDiv>
             <SendMessageInput
               type="text"

@@ -173,7 +173,7 @@ const AddClassBtn = styled.div`
   cursor: pointer;
   padding: 8px;
   display: ${(props) => (props.addClass ? "none" : "flex")};
-  width: 10%;
+  width: 20%;
   align-items: center;
   justify-content: center;
   &:hover {
