@@ -22,34 +22,43 @@ function Assignment({ toast }) {
   const [assignment, setAssignment] = useState({});
   const [assignmentSubmit, setAssignmentSubmit] = useState([]);
   const [classUid, setClassUid] = useState();
+  const [assignmentSubmitted, setAssignmentSubmitted] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      const q = query(
-        collection(db, "users"),
-        where("uid", "==", currentUser.uid)
-      );
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach(async (document) => {
-        console.log(document.id, " => ", document.data());
-        const classSnap = await getDoc(
-          doc(db, "classes", document.data().classId)
+      try {
+        const q = query(
+          collection(db, "users"),
+          where("uid", "==", currentUser.uid)
         );
-        setClassUid(document.data().classId);
-        if (classSnap.exists()) {
-          console.log("Document data:", classSnap.data());
-          setClassData(classSnap.data());
-          for (let i = 0; i < classSnap.data().assignments.length; i++) {
-            if (classSnap.data().assignments[i].title === assignmentId) {
-              setAssignment(classSnap.data().assignments[i]);
-              setAssignmentSubmit(classSnap.data().assignments[i].submitted);
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach(async (document) => {
+          console.log(document.id, " => ", document.data());
+          const classSnap = await getDoc(
+            doc(db, "classes", document.data().classId)
+          );
+          setClassUid(document.data().classId);
+          if (classSnap.exists()) {
+            console.log("Document data:", classSnap.data());
+            setClassData(classSnap.data());
+            const assignment = classSnap
+              .data()
+              .assignments.find((assign) => assign.title === assignmentId);
+            if (assignment) {
+              setAssignment(assignment);
+              setAssignmentSubmit(assignment.submitted);
+              setAssignmentSubmitted(assignment.submissions);
             }
+          } else {
+            console.log("No such document!");
           }
-        } else {
-          console.log("No such document!");
-        }
-      });
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        // Handle error (e.g., show an error message)
+      }
     };
+
     fetchData();
   }, [currentUser.uid, assignmentId]);
 
@@ -114,7 +123,25 @@ function Assignment({ toast }) {
               <tr key={student.uid}>
                 <Td>{index + 1}</Td>
                 <Td>{student.name}</Td>
-                <Td></Td>
+                <Td>
+                  {assignmentSubmitted.some(
+                    (submission) => submission.uid === student.uid
+                  ) && (
+                    <DownloadBtn
+                      onClick={() =>
+                        window.open(
+                          assignmentSubmitted.find(
+                            (submission) => submission.uid === student.uid
+                          ).url,
+                          "_blank"
+                        )
+                      }
+                    >
+                      Check
+                    </DownloadBtn>
+                  )}
+                </Td>
+
                 <Td>
                   {assignmentSubmit.includes(student.uid) ? (
                     <CheckedBtn onClick={() => handleNotChecked(student.uid)}>
@@ -229,4 +256,19 @@ const SendBtnDiv = styled.div`
   justify-content: center;
   margin-top: 25px;
   font-size: 2rem;
+`;
+
+const DownloadBtn = styled.div`
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 12px;
+  cursor: pointer;
+  width: 30%;
+  text-align: center;
+  background-color: #f0f0f0;
+  margin: auto; /* Center the button horizontally */
+  margin-top: 5px; /* Add margin between buttons */
+  &:hover {
+    background-color: #d9d9d9;
+  }
 `;
